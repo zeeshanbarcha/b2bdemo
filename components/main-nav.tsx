@@ -2,97 +2,158 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Search, ShoppingCart, Heart, Bell, LayoutDashboard, ShoppingBag, Settings } from "lucide-react"
+import { Search, ShoppingCart, Heart, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { AuthModal } from "./auth-modal"
+import { useAuth } from "@/contexts/auth-context"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { toast } from "react-hot-toast"
+import { useRouter } from "next/navigation"
 
 export function MainNav() {
   const [showAuthModal, setShowAuthModal] = useState(false)
-  const pathname = usePathname()
-  const isDashboard = pathname?.startsWith("/dashboard")
+  const { user, logout } = useAuth()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    logout()
+    router.push('/')
+    toast.success('Logged out successfully')
+  }
+
+  const getInitials = (name: string | null) => {
+    if (!name) return "U"
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+  }
 
   return (
-    <>
-      <header className="sticky top-0 z-50 w-full border-b bg-white">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8">
-          <Link href="/" className="flex items-center">
-            <span className="sr-only">Daraz</span>
-            <ShoppingBag className="h-8 w-8 text-primary-500" />
-          </Link>
-          <div className="hidden flex-1 md:mx-8 md:block lg:mx-12">
+    <header className="sticky top-0 z-50 w-full border-b bg-white">
+      <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between gap-4">
+          <div className="flex items-center gap-6 lg:gap-8">
+            <Link href="/" className="flex-shrink-0">
+              <span className="text-xl font-bold">7-Eleven</span>
+            </Link>
+            <div className="hidden lg:flex lg:gap-6">
+              <Link
+                href="/products"
+                className="text-sm font-medium transition-colors hover:text-primary"
+              >
+                Products
+              </Link>
+              <Link
+                href="/categories"
+                className="text-sm font-medium transition-colors hover:text-primary"
+              >
+                Categories
+              </Link>
+              <Link
+                href="/deals"
+                className="text-sm font-medium transition-colors hover:text-primary"
+              >
+                Deals
+              </Link>
+            </div>
+          </div>
+
+          <div className="hidden flex-1 lg:block lg:max-w-md xl:max-w-lg">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
               <Input
                 type="search"
-                placeholder="I am shopping for..."
-                className="w-full max-w-md pl-10"
+                placeholder="Search products..."
+                className="w-full pl-9 pr-4"
               />
             </div>
           </div>
-          <nav className="flex items-center gap-2 sm:gap-4">
-            <Link href="/dashboard/orders">
-              <Button variant="ghost" size="icon" className="hidden sm:inline-flex">
-                <ShoppingCart className="h-5 w-5" />
-              </Button>
-            </Link>
-            <Link href="/dashboard/wishlist">
-              <Button variant="ghost" size="icon" className="hidden sm:inline-flex">
-                <Heart className="h-5 w-5" />
-              </Button>
-            </Link>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowAuthModal(true)}
-              className="hidden sm:inline-flex"
+
+          <div className="flex items-center gap-2 lg:gap-4">
+            <Link
+              href="/dashboard/wishlist"
+              className="hidden h-9 w-9 items-center justify-center rounded-md hover:bg-neutral-100 lg:flex"
             >
-              Sign in
-            </Button>
-          </nav>
-        </div>
-        {!isDashboard && (
-          <div className="border-t bg-neutral-50">
-            <div className="mx-auto flex h-12 max-w-7xl items-center gap-6 overflow-x-auto px-6 lg:px-8">
-              <Link
-                href="/products?category=electronics"
-                className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
+              <Heart className="h-5 w-5" />
+            </Link>
+            <Link
+              href="/dashboard/orders"
+              className="hidden h-9 w-9 items-center justify-center rounded-md hover:bg-neutral-100 lg:flex"
+            >
+              <ShoppingCart className="h-5 w-5" />
+            </Link>
+            <Link
+              href="/dashboard/notifications"
+              className="hidden h-9 w-9 items-center justify-center rounded-md hover:bg-neutral-100 lg:flex"
+            >
+              <Bell className="h-5 w-5" />
+            </Link>
+
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="relative h-9 w-9 rounded-full"
+                  >
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={user.image || undefined} alt={user.name || ''} />
+                      <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user.name}</p>
+                      <p className="text-xs leading-none text-neutral-500">
+                        {user.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard" className="w-full">Dashboard</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/settings" className="w-full">Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/settings" className="w-full">Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-red-600 cursor-pointer"
+                    onClick={handleLogout}
+                  >
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button 
+                onClick={() => setShowAuthModal(true)}
+                className="whitespace-nowrap"
               >
-                Electronics
-              </Link>
-              <Link
-                href="/products?category=fashion"
-                className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
-              >
-                Fashion
-              </Link>
-              <Link
-                href="/products?category=home"
-                className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
-              >
-                Home
-              </Link>
-              <Link
-                href="/products?category=beauty"
-                className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
-              >
-                Beauty
-              </Link>
-              <Link
-                href="/products?category=sports"
-                className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
-              >
-                Sports
-              </Link>
-            </div>
+                Sign In
+              </Button>
+            )}
           </div>
-        )}
-      </header>
-      <AuthModal 
-        open={showAuthModal} 
-        onOpenChange={setShowAuthModal} 
-      />
-    </>
+        </div>
+      </nav>
+
+      <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
+    </header>
   )
 }

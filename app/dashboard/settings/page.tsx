@@ -1,11 +1,51 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useAuth } from "@/contexts/auth-context"
+import { useState, useEffect } from "react"
+import { toast } from "react-hot-toast"
 
 export default function SettingsPage() {
+  const { user } = useAuth()
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: ""
+  })
+
+  useEffect(() => {
+    if (user) {
+      // Split name into first and last name
+      const [firstName = "", lastName = ""] = user.name?.split(" ") || []
+      setFormData(prev => ({
+        ...prev,
+        firstName,
+        lastName,
+        email: user.email
+      }))
+    }
+  }, [user])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    toast.success("Settings updated successfully")
+  }
+
+  if (!user) {
+    return <div>Please log in to view settings</div>
+  }
+
   return (
-    <div className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Settings</h1>
         <p className="text-neutral-500">Manage your account settings</p>
@@ -20,20 +60,33 @@ export default function SettingsPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="firstName">First Name</Label>
-                <Input id="firstName" defaultValue="John" />
+                <Input 
+                  id="firstName" 
+                  value={formData.firstName}
+                  onChange={e => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="lastName">Last Name</Label>
-                <Input id="lastName" defaultValue="Doe" />
+                <Input 
+                  id="lastName" 
+                  value={formData.lastName}
+                  onChange={e => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
+                />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" defaultValue="john.doe@example.com" />
+              <Input 
+                id="email" 
+                type="email" 
+                value={formData.email}
+                onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Phone</Label>
-              <Input id="phone" type="tel" defaultValue="+1 (555) 123-4567" />
+              <Input id="phone" type="tel" defaultValue="" />
             </div>
           </CardContent>
         </Card>
@@ -99,9 +152,9 @@ export default function SettingsPage() {
         </Card>
 
         <div className="flex justify-end">
-          <Button>Save Changes</Button>
+          <Button type="submit">Save Changes</Button>
         </div>
       </div>
-    </div>
+    </form>
   )
 }

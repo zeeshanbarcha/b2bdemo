@@ -1,32 +1,40 @@
+"use client"
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ShoppingCart, Trash2 } from "lucide-react"
-
-const wishlistItems = [
-  {
-    id: "1",
-    name: "Classic White T-Shirt",
-    price: "$29.99",
-    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200&fit=crop",
-    inStock: true,
-  },
-  {
-    id: "2",
-    name: "Denim Jeans",
-    price: "$79.99",
-    image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=200&h=200&fit=crop",
-    inStock: true,
-  },
-  {
-    id: "3",
-    name: "Leather Jacket",
-    price: "$199.99",
-    image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=200&h=200&fit=crop",
-    inStock: false,
-  },
-]
+import { useEffect, useState } from "react"
+import { getWishlist, removeFromWishlist } from "@/app/actions/wishlist"
+import { toast } from "react-hot-toast"
+import { Product } from "@prisma/client"
+import Image from "next/image"
 
 export default function WishlistPage() {
+  const [wishlistItems, setWishlistItems] = useState<Product[]>([])
+
+  const fetchWishlist = async () => {
+    const response = await getWishlist()
+    if (response.success) {
+      setWishlistItems(response.data || [])
+    } else {
+      toast.error("Failed to fetch wishlist")
+    }
+  }
+
+  const handleRemoveFromWishlist = async (productId: string) => {
+    const response = await removeFromWishlist(productId)
+    if (response.success) {
+      fetchWishlist()
+      toast.success("Removed from wishlist")
+    } else {
+      toast.error("Failed to remove from wishlist")
+    }
+  }
+
+  useEffect(() => {
+    fetchWishlist()
+  }, [])
+
   return (
     <div className="space-y-6">
       <div>
@@ -40,16 +48,19 @@ export default function WishlistPage() {
         {wishlistItems.map((item) => (
           <Card key={item.id}>
             <CardContent className="flex items-center gap-4 p-4">
-              <img
-                src={item.image}
+              <Image
+                src={item.images[0] || "/placeholder.png"}
                 alt={item.name}
-                className="h-20 w-20 rounded-lg object-cover"
+                width={80}
+                height={80}
+                className="rounded-lg object-cover h-16"
+                priority
               />
               <div className="flex flex-1 items-center justify-between">
                 <div className="space-y-1">
                   <h3 className="font-medium">{item.name}</h3>
-                  <p className="font-bold">{item.price}</p>
-                  {!item.inStock && (
+                  <p className="font-bold">${item.price.toFixed(2)}</p>
+                  {item.inStock === 0 && (
                     <p className="text-sm text-red-600">Out of stock</p>
                   )}
                 </div>
@@ -58,6 +69,7 @@ export default function WishlistPage() {
                     variant="outline"
                     size="icon"
                     className="h-8 w-8"
+                    onClick={() => handleRemoveFromWishlist(item.id)}
                   >
                     <Trash2 className="h-4 w-4" />
                     <span className="sr-only">Remove from wishlist</span>
@@ -65,7 +77,7 @@ export default function WishlistPage() {
                   <Button
                     size="sm"
                     className="gap-2"
-                    disabled={!item.inStock}
+                    disabled={item.inStock === 0}
                   >
                     <ShoppingCart className="h-4 w-4" />
                     Add to Cart

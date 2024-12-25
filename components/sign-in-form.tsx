@@ -2,10 +2,15 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { useForm } from "react-hook-form"
+import { yupResolver } from "@hookform/resolvers/yup"
+import toast from "react-hot-toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Icons } from "@/components/icons"
+import { loginSchema, type LoginFormData } from "@/app/validations/auth"
+import { useAuth } from "@/contexts/auth-context"
 
 interface SignInFormProps {
   onSuccess: () => void
@@ -14,26 +19,59 @@ interface SignInFormProps {
 export function SignInForm({ onSuccess }: SignInFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const { setUser } = useAuth()
 
-  async function onSubmit(event: React.FormEvent) {
-    event.preventDefault()
-    setIsLoading(true)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<LoginFormData>({
+    resolver: yupResolver(loginSchema),
+  })
 
-    // Add your authentication logic here
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    setIsLoading(false)
-    onSuccess()
-    router.refresh()
+  async function onSubmit(data: LoginFormData) {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+
+      const result = await response.json()
+
+      if (result.status === 404) {
+        toast.error(result.message)
+        return
+      }
+
+      if (result.status === 201) {
+        setUser(result.result)
+        toast.success(result.message)
+        reset()
+        onSuccess()
+        router.refresh()
+        router.push('/dashboard')
+      }
+    } catch (error) {
+      toast.error('Something went wrong. Please try again.')
+      console.error('Login error:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <div className="grid gap-6">
-      <form onSubmit={onSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
             <Input
+              {...register('email')}
               id="email"
               placeholder="name@example.com"
               type="email"
@@ -41,19 +79,27 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
               autoComplete="email"
               autoCorrect="off"
               disabled={isLoading}
-              required
+              aria-invalid={!!errors.email}
             />
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email.message}</p>
+            )}
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
             <Input
+              {...register('password')}
               id="password"
               type="password"
+              autoComplete="current-password"
               disabled={isLoading}
-              required
+              aria-invalid={!!errors.password}
             />
+            {errors.password && (
+              <p className="text-sm text-red-500">{errors.password.message}</p>
+            )}
           </div>
-          <Button disabled={isLoading}>
+          <Button type="submit" disabled={isLoading}>
             {isLoading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
@@ -61,24 +107,6 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
           </Button>
         </div>
       </form>
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-white px-2 text-neutral-500 dark:bg-neutral-950 dark:text-neutral-400">
-            Or continue with
-          </span>
-        </div>
-      </div>
-      <Button variant="outline" disabled={isLoading}>
-        {isLoading ? (
-          <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <Icons.google className="mr-2 h-4 w-4" />
-        )}
-        Google
-      </Button>
     </div>
   )
 }

@@ -19,7 +19,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   orders        Order[]
   addresses     Address[]
-  wishlist      Product[]
+  wishlist      Product[] @relation("UserWishlist")
   cart          CartItem[]
 }
 
@@ -33,9 +33,11 @@ model Product {
   categoryId  String
   inStock     Int        @default(0)
   discount    Float?
+  featured    Boolean   @default(false)
+  flashSale   Boolean   @default(false)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  wishedBy    User[]
+  wishedBy    User[]    @relation("UserWishlist")
   cartItems   CartItem[]
   orderItems  OrderItem[]
 }

@@ -1,14 +1,13 @@
 "use client"
 
 import { notFound } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ShoppingCart, Minus, Plus, Star } from "lucide-react"
-import { products } from "@/lib/dummy-data"
 import { ProductCard } from "@/components/product-card"
 import { ImageGallery } from "@/components/image-gallery"
 
-export interface Product {
+interface Product {
   id: string
   name: string
   price: number
@@ -21,6 +20,10 @@ export interface Product {
     rating: number
     comment: string
   }>
+  category: {
+    id: string
+    name: string
+  }
 }
 
 interface PageProps {
@@ -30,21 +33,58 @@ interface PageProps {
 }
 
 export default function ProductPage({ params }: PageProps) {
-  const [activeImageIndex, setActiveImageIndex] = useState(0)
-  const product = products.find((p) => p.id === params.id)
-  const relatedProducts = products.slice(0, 4)
+  const [product, setProduct] = useState<Product | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [quantity, setQuantity] = useState(1)
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
+
+  useEffect(() => {
+    fetchProduct()
+  }, [params.id])
+
+  const fetchProduct = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch(`/api/products/${params.id}`)
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error)
+      }
+
+      setProduct(data)
+      fetchRelatedProducts(data.category.id)
+    } catch (error) {
+      console.error("Error fetching product:", error)
+      notFound()
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchRelatedProducts = async (categoryId: string) => {
+    try {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + `/products?category=${categoryId}&limit=4`)
+      const data = await response.json()
+      setRelatedProducts(data.products.filter((p: Product) => p.id !== params.id))
+    } catch (error) {
+      console.error("Error fetching related products:", error)
+    }
+  }
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
 
   if (!product) {
-    notFound()
+    return notFound()
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Product Main Section */}
       <div className="grid gap-8 md:grid-cols-2">
         <ImageGallery images={product.images} productName={product.name} />
 
-        {/* Product Info */}
         <div className="flex flex-col gap-6">
           <div>
             <h1 className="text-3xl font-bold">{product.name}</h1>
@@ -62,15 +102,22 @@ export default function ProductPage({ params }: PageProps) {
             )}
           </div>
 
-          {/* Quantity Selector */}
           <div className="flex items-center gap-4">
             <span className="text-sm font-medium">Quantity:</span>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              >
                 <Minus className="h-4 w-4" />
               </Button>
-              <span className="w-12 text-center">1</span>
-              <Button variant="outline" size="icon">
+              <span className="w-12 text-center">{quantity}</span>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setQuantity(quantity + 1)}
+              >
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
@@ -81,57 +128,62 @@ export default function ProductPage({ params }: PageProps) {
             Add to Cart
           </Button>
 
-          {/* Specifications */}
-          <div className="mt-8">
-            <h2 className="text-xl font-semibold">Specifications</h2>
-            <div className="mt-4 rounded-lg border">
-              <table className="w-full">
-                <tbody>
-                  {Object.entries(product.specifications || {}).map(([key, value]) => (
-                    <tr key={key} className="border-b last:border-0">
-                      <td className="px-4 py-2 font-medium">{key}</td>
-                      <td className="px-4 py-2">{value}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {product.specifications && (
+            <div className="mt-8">
+              <h2 className="text-xl font-semibold">Specifications</h2>
+              <div className="mt-4 rounded-lg border">
+                <table className="w-full">
+                  <tbody>
+                    {Object.entries(product.specifications).map(([key, value]) => (
+                      <tr key={key} className="border-b last:border-0">
+                        <td className="px-4 py-2 font-medium">{key}</td>
+                        <td className="px-4 py-2">{value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
+          )}
+        </div>
+      </div>
+
+      {relatedProducts.length > 0 && (
+        <div className="mt-16">
+          <h2 className="mb-8 text-2xl font-bold">Related Products</h2>
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4">
+            {relatedProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Related Products */}
-      <div className="mt-16">
-        <h2 className="mb-8 text-2xl font-bold">Related Products</h2>
-        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4">
-          {relatedProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      </div>
-
-      {/* Reviews */}
-      <div className="mt-16">
-        <h2 className="mb-8 text-2xl font-bold">Customer Reviews</h2>
-        <div className="space-y-6">
-          {product.reviews?.map((review, i) => (
-            <div key={i} className="rounded-lg border p-4">
-              <div className="flex items-center gap-2">
-                <div className="flex text-yellow-400">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-4 w-4 ${i < review.rating ? 'fill-current' : ''}`}
-                    />
-                  ))}
+      {product.reviews && (
+        <div className="mt-16">
+          <h2 className="mb-8 text-2xl font-bold">Customer Reviews</h2>
+          <div className="space-y-6">
+            {product.reviews.map((review, i) => (
+              <div key={i} className="rounded-lg border p-4">
+                <div className="flex items-center gap-2">
+                  <div className="flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-4 w-4 ${
+                          i < review.rating ? "fill-current" : ""
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="font-medium">{review.name}</span>
                 </div>
-                <span className="font-medium">{review.name}</span>
+                <p className="mt-2 text-muted-foreground">{review.comment}</p>
               </div>
-              <p className="mt-2 text-muted-foreground">{review.comment}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

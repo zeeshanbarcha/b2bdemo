@@ -8,6 +8,7 @@ import {
   ShoppingBag,
   Heart,
   Settings,
+  Bell,
 } from "lucide-react"
 
 const sidebarLinks = [
@@ -25,6 +26,11 @@ const sidebarLinks = [
     title: "Wishlist",
     href: "/dashboard/wishlist",
     icon: Heart,
+  },
+  {
+    title: "Notifications",
+    href: "/dashboard/notifications",
+    icon: Bell,
   },
   {
     title: "Settings",

@@ -1,6 +1,8 @@
 import "./globals.css"
 import { MainNav } from "@/components/main-nav"
 import { Footer } from "@/components/footer"
+import { Toaster } from "react-hot-toast"
+import { AuthProvider } from "@/contexts/auth-context"
 
 export const metadata = {
   title: "7-Eleven",
@@ -15,13 +17,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen bg-background font-sans antialiased">
-        <div className="relative flex min-h-screen flex-col">
-          <MainNav />
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
-        </div>
+        <AuthProvider>
+          <div className="relative flex min-h-screen flex-col">
+            <MainNav />
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </div>
+          <Toaster position="top-center" />
+        </AuthProvider>
       </body>
     </html>
   )

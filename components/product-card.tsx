@@ -5,6 +5,7 @@ import { Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import Image from "next/image"
+import { addToWishlist } from "@/app/actions/wishlist"
 
 interface ProductCardProps {
   product: {
@@ -22,20 +23,18 @@ export function ProductCard({ product }: ProductCardProps) {
     : product.price
 
   return (
-    <Card className="group relative overflow-hidden">
+    <Card className="group relative h-full">
       <Link href={`/products/${product.id}`}>
-        <div className="group relative">
-          <Card className="group relative overflow-hidden">
-            <CardContent className="p-0">
-              <div className="aspect-square overflow-hidden">
-                <Image
-                  src={product.images[0]}
-                  alt={product.name}
-                  width={300}
-                  height={300}
-                  className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                />
-              </div>
+        <div className="flex h-full flex-col">
+          <CardContent className="flex-none p-0">
+            <div className="relative aspect-square overflow-hidden">
+              <Image
+                src={product.images[0]}
+                alt={product.name}
+                width={300}
+                height={300}
+                className="h-full w-full object-cover transition-transform group-hover:scale-105"
+              />
               {product.discount && (
                 <div className="absolute left-2 top-2 rounded-full bg-red-500 px-2 py-1 text-xs font-bold text-white">
                   -{product.discount * 100}%
@@ -45,26 +44,32 @@ export function ProductCard({ product }: ProductCardProps) {
                 variant="ghost"
                 size="icon"
                 className="absolute right-2 top-2 z-20"
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.preventDefault()
-                  // Add to wishlist logic here
+                  const result = await addToWishlist(product.id)
+                  if (!result.success) {
+                    // Show error toast
+                    console.error(result.error)
+                  }
                 }}
               >
                 <Heart className="h-5 w-5" />
               </Button>
-            </CardContent>
-            <CardFooter className="flex flex-col items-start gap-2 p-4">
-              <h3 className="line-clamp-2 text-sm font-medium">{product.name}</h3>
-              <div className="flex items-center gap-2">
-                <span className="font-bold">₹{discountedPrice.toFixed(2)}</span>
-                {product.discount && (
-                  <span className="text-sm text-neutral-500 line-through dark:text-neutral-400">
-                    ₹{product.price.toFixed(2)}
-                  </span>
-                )}
-              </div>
-            </CardFooter>
-          </Card>
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-1 flex-col items-start gap-2 p-4">
+            <h3 className="line-clamp-2 min-h-[40px] text-sm font-medium">
+              {product.name}
+            </h3>
+            <div className="mt-auto flex items-center gap-2">
+              <span className="font-bold">₹{discountedPrice.toFixed(2)}</span>
+              {product.discount && (
+                <span className="text-sm text-neutral-500 line-through dark:text-neutral-400">
+                  ₹{product.price.toFixed(2)}
+                </span>
+              )}
+            </div>
+          </CardFooter>
         </div>
       </Link>
     </Card>

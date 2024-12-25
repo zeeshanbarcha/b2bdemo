@@ -1,5 +1,9 @@
-import { products } from "@/lib/dummy-data"
+"use client"
+
+import { useEffect, useState } from "react"
+import { useSearchParams } from "next/navigation"
 import { ProductCard } from "@/components/product-card"
+import { NotFound } from "@/components/ui/not-found"
 import {
   Select,
   SelectContent,
@@ -8,31 +12,76 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
+interface Product {
+  id: string
+  name: string
+  price: number
+  images: string[]
+  discount?: number
+  category: { id: string; name: string }
+}
+
 export default function ProductsPage() {
+  const searchParams = useSearchParams()
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [category, setCategory] = useState(searchParams.get("category") || "all")
+  const [sort, setSort] = useState("newest")
+
+  useEffect(() => {
+    fetchProducts()
+  }, [page, category, sort])
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true)
+      const params = new URLSearchParams({
+        page: page.toString(),
+        ...(category !== "all" && { category }),
+        sort,
+      })
+      
+      const response = await fetch(`/api/products?${params}`)
+      const data = await response.json()
+      
+      if (!response.ok) throw new Error(data.error)
+      
+      setProducts(data.products)
+      setTotalPages(data.totalPages)
+    } catch (error) {
+      console.error("Error fetching products:", error)
+      setProducts([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold">All Products</h1>
         <p className="mt-2 text-muted-foreground">Browse our collection of products</p>
       </div>
 
-      {/* Filters and Sort */}
       <div className="mb-8 flex items-center justify-between">
         <div className="flex gap-4">
-          <Select defaultValue="all">
+          <Select value={category} onValueChange={setCategory}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="food">Food & Beverages</SelectItem>
-              <SelectItem value="groceries">Groceries</SelectItem>
-              <SelectItem value="household">Household</SelectItem>
+              <SelectItem value="electronics">Electronics</SelectItem>
+              <SelectItem value="home">Home & Kitchen</SelectItem>
+              <SelectItem value="fashion">Fashion</SelectItem>
+              <SelectItem value="beauty">Beauty & Personal Care</SelectItem>
+              <SelectItem value="automotive">Automotive</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        <Select defaultValue="newest">
+        <Select value={sort} onValueChange={setSort}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
@@ -44,30 +93,27 @@ export default function ProductsPage() {
         </Select>
       </div>
 
-      {/* Products Grid */}
-      <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4">
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
-
-      {/* Pagination */}
-      <div className="mt-8 flex justify-center">
-        <nav className="flex gap-2">
-          {[1, 2, 3].map((page) => (
-            <button
-              key={page}
-              className={`px-4 py-2 rounded-lg ${
-                page === 1
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted hover:bg-muted/80"
-              }`}
-            >
-              {page}
-            </button>
+      {loading ? (
+        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="animate-pulse">
+              <div className="aspect-square rounded-lg bg-neutral-200" />
+              <div className="mt-4 space-y-2">
+                <div className="h-4 w-3/4 rounded bg-neutral-200" />
+                <div className="h-4 w-1/2 rounded bg-neutral-200" />
+              </div>
+            </div>
           ))}
-        </nav>
-      </div>
+        </div>
+      ) : products.length === 0 ? (
+        <NotFound message="No products found" />
+      ) : (
+        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
