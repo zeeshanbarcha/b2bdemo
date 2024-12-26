@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import { Prisma } from "@prisma/client"
 
 export async function createProduct(data: {
   name: string
@@ -76,11 +77,11 @@ export async function getProducts(options: {
     const { page = 1, limit = 10, search = "", category = "" } = options
     const skip = (page - 1) * limit
 
-    const where = {
+    const where: Prisma.ProductWhereInput = {
       ...(search && {
         OR: [
-          { name: { contains: search, mode: "insensitive" } },
-          { description: { contains: search, mode: "insensitive" } },
+          { name: { contains: search, mode: "insensitive" as Prisma.QueryMode } },
+          { description: { contains: search, mode: "insensitive" as Prisma.QueryMode } },
         ],
       }),
       ...(category && { categoryId: category }),
