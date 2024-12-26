@@ -13,7 +13,7 @@ export const products = [
       "Material": "100% Cotton",
       "Fit": "Regular",
       "Care": "Machine wash cold",
-      "Origin": "Made in India"
+      "Origin": "Made in Indias"
     },
     category: "Clothing",
     reviews: [
