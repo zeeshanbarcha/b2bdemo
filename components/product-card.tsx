@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import Image from "next/image"
 import { addToWishlist } from "@/app/actions/wishlist"
+import { useAuth } from "@/contexts/auth-context"
+import { toast } from "react-hot-toast"
 
 interface ProductCardProps {
   product: {
@@ -18,9 +20,25 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { user } = useAuth()
   const discountedPrice = product.discount
     ? product.price * (1 - product.discount)
     : product.price
+
+  const handleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (!user) {
+      toast.error("Please sign in to add items to your wishlist")
+      return
+    }
+    
+    const result = await addToWishlist(product.id)
+    if (!result.success) {
+      toast.error(result.error || "Failed to add to wishlist")
+    } else {
+      toast.success("Added to wishlist")
+    }
+  }
 
   return (
     <Card className="group relative h-full">
@@ -44,14 +62,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 variant="ghost"
                 size="icon"
                 className="absolute right-2 top-2 z-20"
-                onClick={async (e) => {
-                  e.preventDefault()
-                  const result = await addToWishlist(product.id)
-                  if (!result.success) {
-                    // Show error toast
-                    console.error(result.error)
-                  }
-                }}
+                onClick={handleWishlist}
               >
                 <Heart className="h-5 w-5" />
               </Button>

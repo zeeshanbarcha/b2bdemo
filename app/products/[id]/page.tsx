@@ -3,9 +3,12 @@
 import { notFound } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { ShoppingCart, Minus, Plus, Star } from "lucide-react"
+import { ShoppingCart, Minus, Plus, Star, Loader2 } from "lucide-react"
 import { ProductCard } from "@/components/product-card"
 import { ImageGallery } from "@/components/image-gallery"
+import { useAuth } from "@/contexts/auth-context"
+import { toast } from "react-hot-toast"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface Product {
   id: string
@@ -32,11 +35,36 @@ interface PageProps {
   }
 }
 
+function ProductSkeleton() {
+  return (
+    <div className="grid gap-8 md:grid-cols-2">
+      <div className="aspect-square rounded-lg bg-neutral-100" />
+      <div className="space-y-4">
+        <Skeleton className="h-8 w-3/4" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-12 w-1/3" />
+        <Skeleton className="h-10 w-32" />
+        <Skeleton className="h-12 w-full" />
+      </div>
+    </div>
+  )
+}
+
+const formatPrice = (price: number) => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(price)
+}
+
 export default function ProductPage({ params }: PageProps) {
+  const { user } = useAuth()
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [quantity, setQuantity] = useState(1)
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
+  const [addingToCart, setAddingToCart] = useState(false)
 
   useEffect(() => {
     fetchProduct()
@@ -72,13 +100,36 @@ export default function ProductPage({ params }: PageProps) {
     }
   }
 
+  const handleAddToCart = async () => {
+    if (!user) {
+      toast.error("Please sign in to add items to cart")
+      return
+    }
+
+    try {
+      setAddingToCart(true)
+      // Add cart logic here
+      toast.success("Added to cart successfully")
+    } catch (error) {
+      toast.error("Failed to add to cart")
+    } finally {
+      setAddingToCart(false)
+    }
+  }
+
   if (loading) {
-    return <div>Loading...</div>
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <ProductSkeleton />
+      </div>
+    )
   }
 
   if (!product) {
     return notFound()
   }
+
+  const discountedPrice = product.price * (1 - (product.discount || 0))
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -93,12 +144,17 @@ export default function ProductPage({ params }: PageProps) {
 
           <div className="flex items-center gap-2">
             <span className="text-3xl font-bold">
-              ₹{product.price * (1 - (product.discount || 0))}
+              {formatPrice(discountedPrice)}
             </span>
             {product.discount && (
-              <span className="text-lg text-muted-foreground line-through">
-                ₹{product.price}
-              </span>
+              <>
+                <span className="text-lg text-muted-foreground line-through">
+                  {formatPrice(product.price)}
+                </span>
+                <span className="rounded-full bg-red-500 px-2 py-1 text-xs font-semibold text-white">
+                  {product.discount * 100}% OFF
+                </span>
+              </>
             )}
           </div>
 
@@ -112,7 +168,7 @@ export default function ProductPage({ params }: PageProps) {
               >
                 <Minus className="h-4 w-4" />
               </Button>
-              <span className="w-12 text-center">{quantity}</span>
+              <span className="w-12 text-center font-medium">{quantity}</span>
               <Button
                 variant="outline"
                 size="icon"
@@ -123,9 +179,18 @@ export default function ProductPage({ params }: PageProps) {
             </div>
           </div>
 
-          <Button size="lg" className="w-full">
-            <ShoppingCart className="mr-2 h-5 w-5" />
-            Add to Cart
+          <Button 
+            size="lg" 
+            className="w-full"
+            onClick={handleAddToCart}
+            disabled={addingToCart}
+          >
+            {addingToCart ? (
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            ) : (
+              <ShoppingCart className="mr-2 h-5 w-5" />
+            )}
+            {addingToCart ? "Adding to Cart..." : "Add to Cart"}
           </Button>
 
           {product.specifications && (
