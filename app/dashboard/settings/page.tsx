@@ -5,39 +5,190 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/contexts/auth-context"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { toast } from "react-hot-toast"
+import { updateUser } from "@/app/actions/user"
+import { Loader2 } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useForm } from "react-hook-form"
+import { yupResolver } from "@hookform/resolvers/yup"
+import { settingsSchema, type SettingsFormData } from "@/app/validations/settings"
+import { cn } from "@/lib/utils"
 
 export default function SettingsPage() {
-  const { user } = useAuth()
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    country: ""
+  const { user, refreshUser } = useAuth()
+  const [loading, setLoading] = useState(false)
+  const [imageLoading, setImageLoading] = useState(false)
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+    watch
+  } = useForm<SettingsFormData>({
+    resolver: yupResolver(settingsSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "",
+      image: ""
+    }
   })
 
   useEffect(() => {
     if (user) {
-      // Split name into first and last name
       const [firstName = "", lastName = ""] = user.name?.split(" ") || []
-      setFormData(prev => ({
-        ...prev,
+      
+      // Batch set form values for better performance
+      const values = {
         firstName,
         lastName,
-        email: user.email
-      }))
+        email: user.email,
+        image: user.image || "",
+        phone: user.phone || "",
+        address: user.address || "",
+        city: user.city || "",
+        state: user.state || "",
+        zipCode: user.zipCode || "",
+        country: user.country || ""
+      }
+      
+      Object.entries(values).forEach(([key, value]) => {
+        setValue(key as keyof SettingsFormData, value)
+      })
     }
-  }, [user])
+  }, [user, setValue])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    toast.success("Settings updated successfully")
+  const onSubmit = async (data: SettingsFormData) => {
+    try {
+      setLoading(true)
+      const result = await updateUser({
+        ...data,
+        image: watch("image")
+      })
+      
+      if (result.success) {
+        toast.success("Settings updated successfully")
+        
+        // First update the local form state
+        if (result.data) {
+          const [firstName = "", lastName = ""] = result.data.name?.split(" ") || []
+          Object.entries({
+            firstName,
+            lastName,
+            email: result.data.email,
+            image: result.data.image || "",
+            phone: result.data.phone || "",
+            address: result.data.address || "",
+            city: result.data.city || "",
+            state: result.data.state || "",
+            zipCode: result.data.zipCode || "",
+            country: result.data.country || ""
+          }).forEach(([key, value]) => {
+            setValue(key as keyof SettingsFormData, value)
+          })
+        }
+        
+        // Then refresh the global user state
+        await refreshUser()
+      } else {
+        toast.error(result.error || "Failed to update settings")
+      }
+    } catch (error) {
+      console.error("Update error:", error)
+      toast.error("Failed to update settings")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    e.target.value = ''
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File size must be less than 5MB")
+      return
+    }
+
+    if (!file.type.startsWith('image/')) {
+      toast.error("Please upload an image file")
+      return
+    }
+
+    try {
+      setImageLoading(true)
+      const formData = new FormData()
+      formData.append("file", file)
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData
+      })
+
+      if (!response.ok) {
+        throw new Error(await response.text())
+      }
+
+      const data = await response.json()
+      
+      if (!data.url) {
+        throw new Error("No URL returned from upload")
+      }
+
+      // Set the image URL in the form
+      setValue("image", data.url)
+      
+      // Update user profile with new image URL
+      const result = await updateUser({
+        firstName: watch("firstName"),
+        lastName: watch("lastName"),
+        email: watch("email"),
+        phone: watch("phone"),
+        address: watch("address"),
+        city: watch("city"),
+        state: watch("state"),
+        zipCode: watch("zipCode"),
+        country: watch("country"),
+        image: data.url
+      })
+
+      if (result.success) {
+        toast.success("Profile picture updated successfully")
+        await refreshUser() // Wait for the refresh to complete
+        
+        // Re-set form values after refresh to ensure consistency
+        if (result.data) {
+          const [firstName = "", lastName = ""] = result.data.name?.split(" ") || []
+          setValue("firstName", firstName)
+          setValue("lastName", lastName)
+          setValue("email", result.data.email)
+          setValue("image", result.data.image || "")
+          setValue("phone", result.data.phone || "")
+          setValue("address", result.data.address || "")
+          setValue("city", result.data.city || "")
+          setValue("state", result.data.state || "")
+          setValue("zipCode", result.data.zipCode || "")
+          setValue("country", result.data.country || "")
+        }
+      } else {
+        toast.error(result.error || "Failed to update profile picture")
+      }
+    } catch (error) {
+      console.error("Upload error:", error)
+      toast.error(error instanceof Error ? error.message : "Failed to upload image")
+    } finally {
+      setImageLoading(false)
+    }
   }
 
   if (!user) {
@@ -45,7 +196,8 @@ export default function SettingsPage() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <Suspense>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Settings</h1>
         <p className="text-neutral-500">Manage your account settings</p>
@@ -57,36 +209,84 @@ export default function SettingsPage() {
             <CardTitle>Profile Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="space-y-2 mb-4">
+              <Label>Profile Picture</Label>
+              <div className="relative w-fit">
+                <Avatar 
+                  className={cn(
+                    "h-20 w-20 cursor-pointer hover:opacity-80 transition-opacity",
+                    imageLoading && "opacity-50"
+                  )}
+                  onClick={() => document.getElementById('image-upload')?.click()}
+                >
+                  <AvatarImage 
+                    src={watch("image") || ""} 
+                    alt="Profile picture"
+                    onError={(e) => {
+                      console.error("Image load error:", e)
+                      e.currentTarget.src = "" // Clear source on error
+                    }}
+                  />
+                  <AvatarFallback>
+                    {watch("firstName")?.[0]}{watch("lastName")?.[0]}
+                  </AvatarFallback>
+                </Avatar>
+                {imageLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  </div>
+                )}
+                <Input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                  disabled={imageLoading}
+                />
+              </div>
+            </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="firstName">First Name</Label>
                 <Input 
-                  id="firstName" 
-                  value={formData.firstName}
-                  onChange={e => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
+                  id="firstName"
+                  {...register("firstName")}
+                  aria-invalid={!!errors.firstName}
                 />
+                {errors.firstName && (
+                  <p className="text-sm text-red-500">{errors.firstName.message}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="lastName">Last Name</Label>
                 <Input 
-                  id="lastName" 
-                  value={formData.lastName}
-                  onChange={e => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
+                  id="lastName"
+                  {...register("lastName")}
+                  aria-invalid={!!errors.lastName}
                 />
+                {errors.lastName && (
+                  <p className="text-sm text-red-500">{errors.lastName.message}</p>
+                )}
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input 
-                id="email" 
-                type="email" 
-                value={formData.email}
-                onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                id="email"
+                type="email"
+                {...register("email")}
+                aria-invalid={!!errors.email}
+                disabled
+                className="bg-neutral-50"
               />
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Phone</Label>
-              <Input id="phone" type="tel" defaultValue="" />
+              <Input id="phone" type="tel" {...register("phone")} />
             </div>
           </CardContent>
         </Card>
@@ -98,26 +298,26 @@ export default function SettingsPage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="address">Street Address</Label>
-              <Input id="address" defaultValue="123 Main St" />
+              <Input id="address" {...register("address")} />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="city">City</Label>
-                <Input id="city" defaultValue="New York" />
+                <Input id="city" {...register("city")} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="state">State</Label>
-                <Input id="state" defaultValue="NY" />
+                <Input id="state" {...register("state")} />
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="zipCode">ZIP Code</Label>
-                <Input id="zipCode" defaultValue="10001" />
+                <Input id="zipCode" {...register("zipCode")} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="country">Country</Label>
-                <Input id="country" defaultValue="United States" />
+                <Input id="country" {...register("country")} />
               </div>
             </div>
           </CardContent>
@@ -151,10 +351,20 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <div className="flex justify-end">
-          <Button type="submit">Save Changes</Button>
+        <div className="flex justify-end mb-10">
+          <Button type="submit" disabled={loading}>
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              "Save Changes"
+            )}
+          </Button>
         </div>
       </div>
     </form>
+    </Suspense>
   )
 }

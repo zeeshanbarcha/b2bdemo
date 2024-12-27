@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
-      result: userWithoutPassword,
+      user: userWithoutPassword,
       message: "Login successful",
       status: 201
     });

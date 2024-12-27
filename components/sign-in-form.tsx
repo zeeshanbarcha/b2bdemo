@@ -33,7 +33,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
   async function onSubmit(data: LoginFormData) {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/login', {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,13 +48,15 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
         return
       }
 
-      if (result.status === 201) {
-        setUser(result.result)
+      if (result.status === 201 && result.user) {
+        setUser(result.user)
         toast.success(result.message)
         reset()
         onSuccess()
         router.refresh()
         router.push('/dashboard')
+      } else {
+        toast.error('Invalid response from server')
       }
     } catch (error) {
       toast.error('Something went wrong. Please try again.')

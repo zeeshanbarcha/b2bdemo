@@ -5,7 +5,10 @@ import { Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import Image from "next/image"
-import { addToWishlist } from "@/app/actions/wishlist"
+import { addToWishlist, getWishlist, removeFromWishlist } from "@/app/actions/wishlist"
+import { useAuth } from "@/contexts/auth-context"
+import { toast } from "react-hot-toast"
+import { useEffect, useState } from "react"
 
 interface ProductCardProps {
   product: {
@@ -18,9 +21,55 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { user, refreshCounts } = useAuth()
+  const [isInWishlist, setIsInWishlist] = useState(false)
   const discountedPrice = product.discount
     ? product.price * (1 - product.discount)
     : product.price
+
+  useEffect(() => {
+    const checkWishlist = async () => {
+      if (user) {
+        const response = await getWishlist()
+        if (response.success && response.data) {
+          setIsInWishlist(response.data.some((item) => item.id === product.id))
+        }
+      }
+    }
+    checkWishlist()
+  }, [user, product.id])
+
+  const handleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (!user) {
+      toast.error("Please sign in to add items to your wishlist")
+      return
+    }
+    
+    try {
+      if (isInWishlist) {
+        const result = await removeFromWishlist(product.id)
+        if (result.success) {
+          setIsInWishlist(false)
+          toast.success("Removed from wishlist")
+          refreshCounts()
+        } else {
+          toast.error(result.error || "Failed to remove from wishlist")
+        }
+      } else {
+        const result = await addToWishlist(product.id)
+        if (result.success) {
+          setIsInWishlist(true)
+          toast.success("Added to wishlist")
+          refreshCounts()
+        } else {
+          toast.error(result.error || "Failed to add to wishlist")
+        }
+      }
+    } catch (error) {
+      toast.error("Failed to update wishlist")
+    }
+  }
 
   return (
     <Card className="group relative h-full">
@@ -43,17 +92,10 @@ export function ProductCard({ product }: ProductCardProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute right-2 top-2 z-20"
-                onClick={async (e) => {
-                  e.preventDefault()
-                  const result = await addToWishlist(product.id)
-                  if (!result.success) {
-                    // Show error toast
-                    console.error(result.error)
-                  }
-                }}
+                className={`absolute right-2 top-2 z-20 ${isInWishlist ? 'text-red-500 hover:text-red-600' : ''}`}
+                onClick={handleWishlist}
               >
-                <Heart className="h-5 w-5" />
+                <Heart className="h-5 w-5" fill={isInWishlist ? "currentColor" : "none"} />
               </Button>
             </div>
           </CardContent>

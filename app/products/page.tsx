@@ -1,7 +1,27 @@
 "use client"
 
-import { Suspense } from "react"
-import { ProductsList } from "@/components/products-list"
+import dynamic from 'next/dynamic'
+
+// Dynamically import ProductsList with SSR disabled
+const DynamicProductsList = dynamic(
+  () => import('@/components/products-list').then(mod => mod.ProductsList),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4">
+        {[...Array(8)].map((_, i) => (
+          <div key={i} className="animate-pulse">
+            <div className="aspect-square rounded-lg bg-neutral-200" />
+            <div className="mt-4 space-y-2">
+              <div className="h-4 w-3/4 rounded bg-neutral-200" />
+              <div className="h-4 w-1/2 rounded bg-neutral-200" />
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+)
 
 export default function ProductsPage() {
   return (
@@ -10,25 +30,7 @@ export default function ProductsPage() {
         <h1 className="text-3xl font-bold">All Products</h1>
         <p className="mt-2 text-muted-foreground">Browse our collection of products</p>
       </div>
-      <Suspense fallback={<ProductsSkeleton />}>
-        <ProductsList />
-      </Suspense>
-    </div>
-  )
-}
-
-function ProductsSkeleton() {
-  return (
-    <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4">
-      {[...Array(8)].map((_, i) => (
-        <div key={i} className="animate-pulse">
-          <div className="aspect-square rounded-lg bg-neutral-200" />
-          <div className="mt-4 space-y-2">
-            <div className="h-4 w-3/4 rounded bg-neutral-200" />
-            <div className="h-4 w-1/2 rounded bg-neutral-200" />
-          </div>
-        </div>
-      ))}
+      <DynamicProductsList />
     </div>
   )
 }

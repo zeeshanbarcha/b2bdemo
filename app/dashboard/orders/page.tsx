@@ -1,111 +1,35 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Package, ArrowUpDown } from "lucide-react"
+"use client"
 
-const orders = [
-  {
-    id: "ORD001",
-    date: "2024-01-23",
-    status: "Delivered",
-    total: "$29.99",
-    items: [
-      {
-        name: "Classic White T-Shirt",
-        quantity: 1,
-        price: "$29.99",
-      },
-    ],
-  },
-  {
-    id: "ORD002",
-    date: "2024-01-22",
-    status: "In Transit",
-    total: "$79.99",
-    items: [
-      {
-        name: "Denim Jeans",
-        quantity: 1,
-        price: "$79.99",
-      },
-    ],
-  },
-  {
-    id: "ORD003",
-    date: "2024-01-20",
-    status: "Processing",
-    total: "$199.99",
-    items: [
-      {
-        name: "Leather Jacket",
-        quantity: 1,
-        price: "$199.99",
-      },
-    ],
-  },
-]
+import { Suspense } from "react"
+import { OrdersContent } from "@/components/dashboard/orders-content"
 
 export default function OrdersPage() {
+  return (
+    <Suspense fallback={<OrdersSkeleton />}>
+      <OrdersContent />
+    </Suspense>
+  )
+}
+
+function OrdersSkeleton() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Orders</h1>
-          <p className="text-neutral-500">Manage your orders and track deliveries</p>
+          <div className="h-8 w-32 bg-gray-200 rounded animate-pulse" />
+          <div className="h-4 w-48 bg-gray-200 rounded mt-2 animate-pulse" />
         </div>
-        <Button variant="outline" className="gap-2">
-          <ArrowUpDown className="h-4 w-4" />
-          Sort
-        </Button>
+        <div className="h-10 w-24 bg-gray-200 rounded animate-pulse" />
       </div>
-
       <div className="grid gap-4">
-        {orders.map((order) => (
-          <Card key={order.id}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-base font-medium">
-                Order #{order.id}
-              </CardTitle>
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-neutral-500">{order.date}</span>
-                <span
-                  className={`rounded-full px-2 py-1 text-xs font-medium ${
-                    order.status === "Delivered"
-                      ? "bg-green-100 text-green-700"
-                      : order.status === "In Transit"
-                      ? "bg-blue-100 text-blue-700"
-                      : "bg-yellow-100 text-yellow-700"
-                  }`}
-                >
-                  {order.status}
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {order.items.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between border-t pt-4 first:border-t-0 first:pt-0"
-                  >
-                    <div className="flex items-center gap-4">
-                      <Package className="h-8 w-8 text-neutral-400" />
-                      <div>
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-sm text-neutral-500">
-                          Quantity: {item.quantity}
-                        </p>
-                      </div>
-                    </div>
-                    <p className="font-medium">{item.price}</p>
-                  </div>
-                ))}
-                <div className="flex items-center justify-between border-t pt-4">
-                  <p className="font-medium">Total</p>
-                  <p className="font-bold">{order.total}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="p-4 rounded-lg border animate-pulse">
+            <div className="h-6 w-24 bg-gray-200 rounded mb-4" />
+            <div className="space-y-2">
+              <div className="h-4 w-full bg-gray-200 rounded" />
+              <div className="h-4 w-2/3 bg-gray-200 rounded" />
+            </div>
+          </div>
         ))}
       </div>
     </div>
