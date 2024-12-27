@@ -1,6 +1,6 @@
 "use client"
 
-import { notFound } from "next/navigation"
+import { notFound, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ShoppingCart, Minus, Plus, Star, Loader2 } from "lucide-react"
@@ -9,6 +9,7 @@ import { ImageGallery } from "@/components/image-gallery"
 import { useAuth } from "@/contexts/auth-context"
 import { toast } from "react-hot-toast"
 import { Skeleton } from "@/components/ui/skeleton"
+import { addToCart, checkCartItem, updateCartQuantity } from "@/app/actions/cart"
 
 interface Product {
   id: string
@@ -59,16 +60,26 @@ const formatPrice = (price: number) => {
 }
 
 export default function ProductPage({ params }: PageProps) {
-  const { user } = useAuth()
+  const router = useRouter()
+  const { user, refreshCounts } = useAuth()
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [quantity, setQuantity] = useState(1)
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const [addingToCart, setAddingToCart] = useState(false)
+  const [isInCart, setIsInCart] = useState(false)
 
   useEffect(() => {
     fetchProduct()
-  }, [params.id])
+    if (user) {
+      checkIfInCart()
+    }
+  }, [params.id, user])
+
+  const checkIfInCart = async () => {
+    const existingItem = await checkCartItem(params.id)
+    setIsInCart(!!existingItem)
+  }
 
   const fetchProduct = async () => {
     try {
@@ -106,10 +117,21 @@ export default function ProductPage({ params }: PageProps) {
       return
     }
 
+    if (!product) return
+
     try {
       setAddingToCart(true)
-      // Add cart logic here
-      toast.success("Added to cart successfully")
+      const result = await addToCart(product.id, quantity)
+      if (result.success) {
+        toast.success("Added to cart successfully")
+        refreshCounts()
+        router.push('/dashboard/orders')
+      } else {
+        if (result.existingItem) {
+          setIsInCart(true)
+        }
+        toast.error(result.error || "Failed to add to cart")
+      }
     } catch (error) {
       toast.error("Failed to add to cart")
     } finally {
@@ -183,14 +205,14 @@ export default function ProductPage({ params }: PageProps) {
             size="lg" 
             className="w-full"
             onClick={handleAddToCart}
-            disabled={addingToCart}
+            disabled={addingToCart || isInCart}
           >
             {addingToCart ? (
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
             ) : (
               <ShoppingCart className="mr-2 h-5 w-5" />
             )}
-            {addingToCart ? "Adding to Cart..." : "Add to Cart"}
+            {addingToCart ? "Adding to Cart..." : isInCart ? "Already in Cart" : "Add to Cart"}
           </Button>
 
           {product.specifications && (

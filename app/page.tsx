@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { ProductCard } from "@/components/product-card"
 import { CategoriesSection } from "@/components/categories-section"
 import Link from "next/link"
@@ -19,6 +19,14 @@ interface Product {
 }
 
 export default function HomePage() {
+  return (
+    <Suspense>
+      <HomeContent />
+    </Suspense>
+  )
+}
+
+function HomeContent() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([])
   const [newProducts, setNewProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -31,8 +39,8 @@ export default function HomePage() {
     try {
       setLoading(true)
       const [featuredResponse, newResponse] = await Promise.all([
-        fetch("/api/products?limit=5&featured=true"),
-        fetch("/api/products?limit=10&sort=newest")
+        fetch(process.env.NEXT_PUBLIC_API_URL + "/products?limit=5&featured=true"),
+        fetch(process.env.NEXT_PUBLIC_API_URL + "/products?limit=10&sort=newest")
       ])
 
       const [featuredData, newData] = await Promise.all([

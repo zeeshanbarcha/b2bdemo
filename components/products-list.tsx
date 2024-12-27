@@ -1,7 +1,7 @@
 "use client"
 
-import { useSearchParams } from "next/navigation"
-import { useState, useEffect } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
+import { useState, useEffect, Suspense } from "react"
 import { ProductCard } from "@/components/product-card"
 import { NotFound } from "@/components/ui/not-found"
 
@@ -30,18 +30,20 @@ function ProductsSkeleton() {
   )
 }
 
-export function ProductsList() {
+function ProductsListContent() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [category, setCategory] = useState(searchParams.get("category") || "all")
   const [sort, setSort] = useState("newest")
+  const query = searchParams.get("q") || ""
 
   useEffect(() => {
     fetchProducts()
-  }, [page, category, sort])
+  }, [page, category, sort, query])
 
   const fetchProducts = async () => {
     try {
@@ -50,9 +52,10 @@ export function ProductsList() {
         page: page.toString(),
         ...(category !== "all" && { category }),
         sort,
+        ...(query && { q: query }),
       })
       
-      const response = await fetch(`/api/products?${params}`)
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + `/products?${params}`)
       const data = await response.json()
       
       if (!response.ok) throw new Error(data.error)
@@ -81,5 +84,13 @@ export function ProductsList() {
         <ProductCard key={product.id} product={product} />
       ))}
     </div>
+  )
+}
+
+export function ProductsList() {
+  return (
+    <Suspense fallback={<ProductsSkeleton />}>
+      <ProductsListContent />
+    </Suspense>
   )
 } 

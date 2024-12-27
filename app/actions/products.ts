@@ -1,7 +1,6 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import { revalidatePath } from "next/cache"
 import { Prisma } from "@prisma/client"
 
 export async function createProduct(data: {
@@ -45,8 +44,7 @@ export async function updateProduct(
         category: true,
       },
     })
-    revalidatePath("/products")
-    revalidatePath(`/products/${id}`)
+    
     return { success: true, data: product }
   } catch (error) {
     console.error("Error updating product:", error)
@@ -59,7 +57,6 @@ export async function deleteProduct(id: string) {
     await prisma.product.delete({
       where: { id },
     })
-    revalidatePath("/products")
     return { success: true }
   } catch (error) {
     console.error("Error deleting product:", error)
@@ -113,5 +110,30 @@ export async function getProducts(options: {
   } catch (error) {
     console.error("Error fetching products:", error)
     return { success: false, error: "Failed to fetch products" }
+  }
+}
+
+export async function updateProductField(
+  id: string,
+  data: {
+    inStock?: number
+    featured?: boolean
+    flashSale?: boolean
+    discount?: number | null
+  }
+) {
+  try {
+    const product = await prisma.product.update({
+      where: { id },
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      }
+    })
+
+    return { success: true, data: product }
+  } catch (error) {
+    console.error("[UPDATE_PRODUCT_FIELD]", error)
+    return { success: false, error: "Failed to update product" }
   }
 } 

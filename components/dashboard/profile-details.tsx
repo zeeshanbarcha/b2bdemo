@@ -33,12 +33,28 @@ export function ProfileDetails() {
       </div>
       <div className="space-y-2">
         <div>
-          <p className="text-sm font-medium">Wallet Balance</p>
-          <p className="text-sm text-neutral-600">${user.walletBalance.toFixed(2)}</p>
+          <p className="text-sm font-medium">Phone</p>
+          <p className="text-sm text-neutral-600">{user.phone || "Not set"}</p>
         </div>
         <div>
-          <p className="text-sm font-medium">Role</p>
-          <p className="text-sm text-neutral-600 capitalize">{user.role}</p>
+          <p className="text-sm font-medium">Address</p>
+          <p className="text-sm text-neutral-600">
+            {user.address ? (
+              <>
+                {user.address}
+                {user.city && `, ${user.city}`}
+                {user.state && `, ${user.state}`}
+                {user.zipCode && ` ${user.zipCode}`}
+                {user.country && `, ${user.country}`}
+              </>
+            ) : (
+              "Not set"
+            )}
+          </p>
+        </div>
+        <div>
+          <p className="text-sm font-medium">Wallet Balance</p>
+          <p className="text-sm text-neutral-600">${user.walletBalance.toFixed(2)}</p>
         </div>
       </div>
       <Link href="/dashboard/settings">

@@ -1,53 +1,65 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
-import { Prisma } from "@prisma/client"
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get("page") || "1")
-    const limit = parseInt(searchParams.get("limit") || "10")
-    const category = searchParams.get("category") || ""
+    const category = searchParams.get("category")
     const sort = searchParams.get("sort") || "newest"
+    const query = searchParams.get("q")
     const featured = searchParams.get("featured") === "true"
     const flashSale = searchParams.get("flashSale") === "true"
-
-    const skip = (page - 1) * limit
+    const limit = parseInt(searchParams.get("limit") || "12")
 
     const where = {
-      ...(category && { categoryId: category }),
-      ...(featured && { featured: true }),
-      ...(flashSale && { flashSale: true }),
-    }
-
-    const orderBy: Prisma.ProductOrderByWithRelationInput = {
-      ...(sort === "newest" && { createdAt: "desc" }),
-      ...(sort === "price-low" && { price: "asc" }),
-      ...(sort === "price-high" && { price: "desc" }),
+      ...(category && category !== "all" ? { categoryId: category } : {}),
+      ...(featured ? { featured: true } : {}),
+      ...(flashSale ? { flashSale: true } : {}),
+      ...(query
+        ? {
+            OR: [
+              { name: { contains: query, mode: "insensitive" as const } },
+              { description: { contains: query, mode: "insensitive" as const } },
+            ],
+          }
+        : {}),
     }
 
     const [products, total] = await Promise.all([
       prisma.product.findMany({
         where,
-        skip,
-        take: limit,
         include: {
-          category: true,
+          category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
-        orderBy,
+        orderBy: {
+          ...(sort === "newest"
+            ? { createdAt: "desc" }
+            : sort === "price-asc"
+            ? { price: "asc" }
+            : sort === "price-desc"
+            ? { price: "desc" }
+            : { createdAt: "desc" }),
+        },
+        skip: (page - 1) * limit,
+        take: limit,
       }),
       prisma.product.count({ where }),
     ])
 
     return NextResponse.json({
       products,
-      total,
       totalPages: Math.ceil(total / limit),
     })
   } catch (error) {
-    console.error("Error fetching products:", error)
+    console.error("Products API error:", error)
     return NextResponse.json(
-      { error: "Error fetching products" },
+      { error: "Failed to fetch products" },
       { status: 500 }
     )
   }
