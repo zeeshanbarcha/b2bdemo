@@ -47,7 +47,6 @@ export async function updateUser(data: {
         image: data.image,
       }
     })
-
     return { success: true, data: user }
   } catch (error) {
     console.error("Error updating user:", error)
