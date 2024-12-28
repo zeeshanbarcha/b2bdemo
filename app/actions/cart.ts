@@ -97,7 +97,7 @@ export async function getCartCount() {
     if (!session?.user?.id) return 0
 
     const count = await prisma.cart.count({
-      where: { userId: session.user.id },
+      where: { userId: session.user.id, status: 'PENDING' },
     })
 
     return count
@@ -151,5 +151,57 @@ export async function removeFromCart(cartItemId: string) {
   } catch (error) {
     console.error("Error removing from cart:", error)
     return { success: false, error: "Failed to remove from cart" }
+  }
+}
+
+export async function processOrder(
+  cartItems: string[], 
+  paymentDetails: {
+    method: string
+    transactionId: string
+    receiptUrl: string
+  },
+  deliveryDetails: {
+    type: 'home' | 'pickup'
+    address?: {
+      street: string
+      city: string
+      state: string
+      pincode: string
+      phone: string
+    }
+  },
+  additionalInfo?: string
+) {
+  try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return { success: false, error: "Not authenticated" }
+    }
+
+    // Update all cart items to PROCESSING status
+    await prisma.cart.updateMany({
+      where: {
+        id: { in: cartItems },
+        userId: session.user.id,
+        status: 'PENDING'
+      },
+      data: {
+        status: 'PROCESSING',
+        paymentMethod: paymentDetails.method,
+        transactionId: paymentDetails.transactionId,
+        paymentReceipt: paymentDetails.receiptUrl,
+        deliveryType: deliveryDetails.type,
+        shippingAddress: deliveryDetails.type === 'home' ? 
+          JSON.stringify(deliveryDetails.address) : 
+          null,
+        additionalInfo: additionalInfo
+      }
+    })
+
+    return { success: true }
+  } catch (error) {
+    console.error("Error processing order:", error)
+    return { success: false, error: "Failed to process order" }
   }
 }

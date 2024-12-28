@@ -9,6 +9,7 @@ import {
   Heart,
   Settings,
   Bell,
+  Building2 as Bank,
 } from "lucide-react"
 
 const sidebarLinks = [
@@ -31,6 +32,11 @@ const sidebarLinks = [
     title: "Notifications",
     href: "/dashboard/notifications",
     icon: Bell,
+  },
+  {
+    title: "Banks List",
+    href: "/dashboard/banks",
+    icon: Bank,
   },
   {
     title: "Settings",
