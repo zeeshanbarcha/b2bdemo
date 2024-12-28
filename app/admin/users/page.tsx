@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { toast } from "react-hot-toast"
+import { UpdateUserModal } from "./update-user-modal"
 
 const USER_ROLES = ['USER', 'ADMIN']
 
@@ -73,8 +74,10 @@ export default function UsersPage() {
             <TableHead>Email</TableHead>
             <TableHead>Role</TableHead>
             <TableHead>Joined</TableHead>
+            <TableHead>Wallet Balance</TableHead>
             <TableHead>Orders</TableHead>
             <TableHead>Total Spent</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -92,6 +95,7 @@ export default function UsersPage() {
               <TableCell>{user.email}</TableCell>
               <TableCell>
                 <Select
+                  disabled
                   value={user.role}
                   onValueChange={(value) => updateUserRole(user.id, value)}
                 >
@@ -110,8 +114,15 @@ export default function UsersPage() {
               <TableCell>
                 {new Date(user.createdAt).toLocaleDateString()}
               </TableCell>
+              <TableCell>${user.walletBalance?.toFixed(2) || "0.00"}</TableCell>
               <TableCell>{user._count?.orders || 0}</TableCell>
               <TableCell>${user.totalSpent?.toFixed(2) || "0.00"}</TableCell>
+              <TableCell>
+                <UpdateUserModal 
+                  user={user} 
+                  onUpdate={fetchUsers} 
+                />
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

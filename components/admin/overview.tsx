@@ -35,9 +35,9 @@ export function Overview({ data }: { data: OverviewData[] }) {
         />
         <Bar
           dataKey="total"
-          fill="currentColor"
+          fill="#8b5cf6"
           radius={[4, 4, 0, 0]}
-          className="fill-primary"
+          className="fill-violet-500 hover:fill-violet-600 transition-colors"
         />
       </BarChart>
     </ResponsiveContainer>

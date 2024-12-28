@@ -26,6 +26,7 @@ export async function GET() {
         image: true,
         role: true,
         createdAt: true,
+        walletBalance: true,
         _count: {
           select: {
             Order: true

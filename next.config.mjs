@@ -20,7 +20,13 @@ const nextConfig = {
         hostname: 'r8ufq8lxqtup42rg.public.blob.vercel-storage.com',
         port: '',
         pathname: '/**',
-      }
+      },
+      {
+        protocol: 'https',
+        hostname: '7-11inonline.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
