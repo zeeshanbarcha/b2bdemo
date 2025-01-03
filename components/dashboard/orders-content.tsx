@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Package, ArrowUpDown, Loader2, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { formatPrice } from "@/lib/utils"
+import { useCurrency } from "@/contexts/currency-context"
 import Image from "next/image"
 import { toast } from "react-hot-toast"
 import { useAuth } from "@/contexts/auth-context"
@@ -27,6 +28,7 @@ interface CartItem {
 export function OrdersContent() {
   const router = useRouter()
   const { refreshCounts } = useAuth()
+  const { currency, exchangeRates } = useCurrency()
   const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
@@ -145,7 +147,7 @@ export function OrdersContent() {
                       </div>
                       <div className="flex flex-col items-end gap-2">
                         <p className="font-medium">
-                          {formatPrice(item.product.price * item.quantity)}
+                          {formatPrice(item.product.price * item.quantity, currency, exchangeRates)}
                         </p>
                         {item.status === 'PENDING' && (
                           <Button

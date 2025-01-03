@@ -10,6 +10,8 @@ import { useAuth } from "@/contexts/auth-context"
 import { toast } from "react-hot-toast"
 import { Skeleton } from "@/components/ui/skeleton"
 import { addToCart, checkCartItem, updateCartQuantity } from "@/app/actions/cart"
+import { useCurrency } from "@/contexts/currency-context"
+import { formatPrice } from "@/lib/utils"
 
 interface Product {
   id: string
@@ -51,23 +53,18 @@ function ProductSkeleton() {
   )
 }
 
-const formatPrice = (price: number) => {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0,
-  }).format(price)
-}
-
 export default function ProductPage({ params }: PageProps) {
   const router = useRouter()
   const { user, refreshCounts } = useAuth()
+  const { currency, exchangeRates } = useCurrency()
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [quantity, setQuantity] = useState(1)
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const [addingToCart, setAddingToCart] = useState(false)
   const [isInCart, setIsInCart] = useState(false)
+
+  const displayPrice = (price: number) => formatPrice(price, currency, exchangeRates)
 
   useEffect(() => {
     fetchProduct()
@@ -84,7 +81,7 @@ export default function ProductPage({ params }: PageProps) {
   const fetchProduct = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/products/${params.id}`)
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + `/products/${params.id}`)
       const data = await response.json()
 
       if (!response.ok) {
@@ -166,12 +163,12 @@ export default function ProductPage({ params }: PageProps) {
 
           <div className="flex items-center gap-2">
             <span className="text-3xl font-bold">
-              {formatPrice(discountedPrice)}
+              {displayPrice(discountedPrice)}
             </span>
             {product.discount && (
               <>
                 <span className="text-lg text-muted-foreground line-through">
-                  {formatPrice(product.price)}
+                  {displayPrice(product.price)}
                 </span>
                 <span className="rounded-full bg-red-500 px-2 py-1 text-xs font-semibold text-white">
                   {product.discount * 100}% OFF

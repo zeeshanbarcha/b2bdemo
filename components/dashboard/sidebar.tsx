@@ -57,8 +57,8 @@ export function Sidebar() {
           className={cn(
             "flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors",
             pathname === link.href
-              ? "bg-neutral-900 text-white"
-              : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+              ? "bg-primary text-primary-foreground dark:bg-primary dark:text-primary-foreground"
+              : "text-muted-foreground hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50"
           )}
         >
           <link.icon className="h-4 w-4" />

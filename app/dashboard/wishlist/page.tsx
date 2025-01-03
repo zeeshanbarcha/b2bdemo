@@ -11,6 +11,8 @@ import { Product } from "@prisma/client"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
+import { formatPrice } from "@/lib/utils"
+import { useCurrency } from "@/contexts/currency-context"
 
 export default function WishlistPage() {
   return (
@@ -56,6 +58,7 @@ function WishlistContent() {
   const [wishlistItems, setWishlistItems] = useState<Product[]>([])
   const [addingToCart, setAddingToCart] = useState<Record<string, boolean>>({})
   const [inCartItems, setInCartItems] = useState<Record<string, boolean>>({})
+  const { currency, exchangeRates } = useCurrency()
 
   const checkCartStatus = async (productId: string) => {
     const cartItem = await checkCartItem(productId)
@@ -138,7 +141,7 @@ function WishlistContent() {
               <div className="flex flex-1 items-center justify-between">
                 <div className="space-y-1">
                   <h3 className="font-medium">{item.name}</h3>
-                  <p className="font-bold">${item.price.toFixed(2)}</p>
+                  <p className="font-bold">{formatPrice(item.price, currency, exchangeRates)}</p>
                   {item.inStock === 0 && (
                     <p className="text-sm text-red-600">Out of stock</p>
                   )}

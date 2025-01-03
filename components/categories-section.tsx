@@ -39,12 +39,12 @@ export function CategoriesSection() {
 
         return (
           <Link key={category.id} href={`/products?category=${category.id}`}>
-            <Card className="h-full hover:border-neutral-900 transition-colors">
+            <Card className="h-full hover:border-foreground transition-colors">
               <CardContent className="flex flex-col items-center justify-center p-4 text-center">
-                <div className="mb-3 rounded-full bg-neutral-100 p-2">
-                  <Icon className="h-5 w-5" />
+                <div className="mb-3 rounded-full bg-muted p-2">
+                  <Icon className="h-5 w-5 text-foreground" />
                 </div>
-                <span className="text-sm font-medium">{category.name}</span>
+                <span className="text-sm font-medium text-card-foreground">{category.name}</span>
               </CardContent>
             </Card>
           </Link>

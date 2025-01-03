@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { ShoppingCart, Heart, Bell } from "lucide-react"
+import { ShoppingCart, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AuthModal } from "./auth-modal"
 import { useAuth } from "@/contexts/auth-context"
@@ -18,10 +18,12 @@ import {
 import { toast } from "react-hot-toast"
 import { useRouter } from "next/navigation"
 import { Search as SearchComponent } from "@/components/search"
+import { ThemeToggle } from "./theme-toggle"
+import { CurrencySelector } from "./currency-selector"
 
 export function MainNav() {
   const [showAuthModal, setShowAuthModal] = useState(false)
-  const { user, logout, cartCount, wishlistCount } = useAuth()
+  const { user, logout, cartCount } = useAuth()
   const router = useRouter()
 
   const handleLogout = async () => {
@@ -40,29 +42,29 @@ export function MainNav() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           <div className="flex items-center gap-6 lg:gap-8">
             <Link href="/" className="flex-shrink-0">
-              <span className="text-xl font-bold">7-Eleven</span>
+              <span className="text-xl font-bold text-foreground">7-Eleven</span>
             </Link>
             <div className="hidden lg:flex lg:gap-6">
               <Link
                 href="/products"
-                className="text-sm font-medium transition-colors hover:text-primary"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 Products
               </Link>
               <Link
                 href="/categories"
-                className="text-sm font-medium transition-colors hover:text-primary"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 Categories
               </Link>
               <Link
                 href="/deals"
-                className="text-sm font-medium transition-colors hover:text-primary"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 Deals
               </Link>
@@ -74,35 +76,26 @@ export function MainNav() {
           </div>
 
           <div className="flex items-center gap-2 lg:gap-4">
+            <CurrencySelector />
+            <ThemeToggle />
             {user ? (
               <>
                 <Link
-                  href="/dashboard/wishlist"
-                  className="relative hidden h-9 w-9 items-center justify-center rounded-md hover:bg-neutral-100 lg:flex"
-                >
-                  <Heart className="h-5 w-5" />
-                  {wishlistCount > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-                      {wishlistCount}
-                    </span>
-                  )}
-                </Link>
-                <Link
                   href="/dashboard/orders"
-                  className="relative hidden h-9 w-9 items-center justify-center rounded-md hover:bg-neutral-100 lg:flex"
+                  className="relative hidden h-9 w-9 items-center justify-center rounded-md hover:bg-accent lg:flex"
                 >
-                  <ShoppingCart className="h-5 w-5" />
+                  <ShoppingCart className="h-5 w-5 text-muted-foreground" />
                   {cartCount > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                    <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-xs font-bold text-destructive-foreground">
                       {cartCount}
                     </span>
                   )}
                 </Link>
                 <Link
                   href="/dashboard/notifications"
-                  className="hidden h-9 w-9 items-center justify-center rounded-md hover:bg-neutral-100 lg:flex"
+                  className="hidden h-9 w-9 items-center justify-center rounded-md hover:bg-accent lg:flex"
                 >
-                  <Bell className="h-5 w-5" />
+                  <Bell className="h-5 w-5 text-muted-foreground" />
                 </Link>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -120,7 +113,7 @@ export function MainNav() {
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">{user.name}</p>
-                        <p className="text-xs leading-none text-neutral-500">
+                        <p className="text-xs leading-none text-muted-foreground">
                           {user.email}
                         </p>
                       </div>
@@ -137,7 +130,7 @@ export function MainNav() {
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      className="text-red-600 cursor-pointer"
+                      className="text-destructive cursor-pointer"
                       onClick={handleLogout}
                     >
                       Log out

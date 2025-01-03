@@ -45,16 +45,22 @@ export function FlashSaleTimer() {
 
   return (
     <div className="grid grid-flow-col gap-2 text-center auto-cols-max">
-      <div className="flex flex-col p-2 bg-neutral-100 rounded-lg">
-        <span className="countdown font-mono text-2xl">{timeLeft.hours.toString().padStart(2, '0')}</span>
+      <div className="flex flex-col p-2 bg-muted rounded-lg text-muted-foreground">
+        <span className="countdown font-mono text-2xl text-foreground">
+          {timeLeft.hours.toString().padStart(2, '0')}
+        </span>
         <span className="text-xs">hrs</span>
       </div>
-      <div className="flex flex-col p-2 bg-neutral-100 rounded-lg">
-        <span className="countdown font-mono text-2xl">{timeLeft.minutes.toString().padStart(2, '0')}</span>
+      <div className="flex flex-col p-2 bg-muted rounded-lg text-muted-foreground">
+        <span className="countdown font-mono text-2xl text-foreground">
+          {timeLeft.minutes.toString().padStart(2, '0')}
+        </span>
         <span className="text-xs">min</span>
       </div>
-      <div className="flex flex-col p-2 bg-neutral-100 rounded-lg">
-        <span className="countdown font-mono text-2xl">{timeLeft.seconds.toString().padStart(2, '0')}</span>
+      <div className="flex flex-col p-2 bg-muted rounded-lg text-muted-foreground">
+        <span className="countdown font-mono text-2xl text-foreground">
+          {timeLeft.seconds.toString().padStart(2, '0')}
+        </span>
         <span className="text-xs">sec</span>
       </div>
     </div>

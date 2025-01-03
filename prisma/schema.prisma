@@ -8,27 +8,30 @@ datasource db {
 }
 
 model User {
-  id            String     @id @default(cuid())
-  name          String?
-  email         String     @unique
-  password      String
-  role          String     @default("USER")
-  image         String?
-  walletBalance Float      @default(0)
-  phone         String?
-  address       String?
-  city          String?
-  state         String?
-  zipCode       String?
-  country       String?
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  cart          Cart[]
-  wishlist      Product[]  @relation("UserWishlist")
-  CartItem      CartItem[]
-  Order         Order[]
-  Address       Address[]
-  bankAccounts  BankAccount[]
+  id             String           @id @default(cuid())
+  name           String?
+  email          String           @unique
+  password       String
+  role           String           @default("USER")
+  image          String?
+  walletBalance  Float            @default(0)
+  phone          String?
+  address        String?
+  city           String?
+  state          String?
+  zipCode        String?
+  country        String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  cart           Cart[]
+  wishlist       Product[]        @relation("UserWishlist")
+  CartItem       CartItem[]
+  Order          Order[]
+  Address        Address[]
+  bankAccounts   BankAccount[]
+  SystemSettings SystemSettings[]
+  Withdrawal     Withdrawal[]
+  Notification   Notification[]
 }
 
 model Product {
@@ -120,35 +123,78 @@ enum OrderStatus {
 }
 
 model Cart {
-  id              String    @id @default(cuid())
+  id              String   @id @default(cuid())
   userId          String
   productId       String
   quantity        Int
   price           Float
-  status          String    @default("PENDING")
+  status          String   @default("PENDING")
   paymentMethod   String?
   transactionId   String?
   paymentReceipt  String?
   deliveryType    String?
   shippingAddress String?
   additionalInfo  String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  user            User      @relation(fields: [userId], references: [id])
-  product         Product   @relation(fields: [productId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id])
+  product         Product  @relation(fields: [productId], references: [id])
 
   @@unique([userId, productId])
 }
 
 model BankAccount {
-  id            String   @id @default(cuid())
+  id            String       @id @default(cuid())
   userId        String
   bankName      String
   accountName   String
   accountNumber String
   routingNumber String
-  createdAt     DateTime @default(now())
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime     @default(now())
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Withdrawal    Withdrawal[]
+
+  @@index([userId])
+}
+
+model SystemSettings {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String
+  updatedBy String
+  admin     User     @relation(fields: [createdBy], references: [id])
+
+  @@index([createdBy])
+}
+
+model Withdrawal {
+  id            String      @id @default(cuid())
+  userId        String
+  bankAccountId String
+  amount        Float
+  status        String      @default("PENDING") // PENDING, APPROVED, REJECTED
+  reason        String? // For rejection reason
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  user          User        @relation(fields: [userId], references: [id])
+  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id])
+
+  @@index([userId])
+  @@index([bankAccountId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }

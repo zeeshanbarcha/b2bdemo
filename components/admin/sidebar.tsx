@@ -9,6 +9,8 @@ import {
   ShoppingCart,
   Users,
   ArrowLeft,
+  Settings,
+  Banknote,
 } from "lucide-react"
 
 const routes = [
@@ -32,15 +34,25 @@ const routes = [
     icon: Users,
     href: "/admin/users",
   },
+  {
+    label: "Withdrawals",
+    icon: Banknote,
+    href: "/admin/withdrawals",
+  },
+  {
+    label: "Settings",
+    icon: Settings,
+    href: "/admin/settings",
+  },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <div className="fixed left-0 top-0 flex h-screen w-64 flex-col border-r bg-gray-50">
+    <div className="fixed left-0 top-0 flex h-screen w-64 flex-col border-r bg-background">
       <div className="p-6">
-        <h1 className="text-xl font-bold">Admin Panel</h1>
+        <h1 className="text-xl font-bold text-foreground">Admin Panel</h1>
       </div>
       <nav className="flex-1 space-y-1 px-3">
         {routes.map((route) => (
@@ -48,10 +60,10 @@ export function Sidebar() {
             key={route.href}
             href={route.href}
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium",
+              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
               pathname === route.href
-                ? "bg-gray-200 text-gray-900"
-                : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                ? "bg-accent text-accent-foreground"
+                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             )}
           >
             <route.icon className="h-5 w-5" />
@@ -59,10 +71,10 @@ export function Sidebar() {
           </Link>
         ))}
       </nav>
-      <div className="border-t p-4">
+      <div className="border-t border-border p-4">
         <Link
           href="/"
-          className="flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Website

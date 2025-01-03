@@ -6,10 +6,13 @@ import { WalletBalance } from "@/components/dashboard/wallet-balance"
 import { ProfileDetails } from "@/components/dashboard/profile-details"
 import { Suspense, useEffect, useState } from "react"
 import { getCartCount, getWishlistCount } from "@/app/actions/cart"
+import { useAuth } from "@/contexts/auth-context"
 
 export function DashboardContent() {
   const [cartCount, setCartCount] = useState(0)
   const [wishlistCount, setWishlistCount] = useState(0)
+  const [withdrawalThreshold, setWithdrawalThreshold] = useState(1500)
+  const { user } = useAuth()
 
   useEffect(() => {
     const fetchCounts = async () => {
@@ -23,13 +26,30 @@ export function DashboardContent() {
     fetchCounts()
   }, [])
 
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch('/api/admin/settings')
+        if (!response.ok) throw new Error()
+        const data = await response.json()
+        setWithdrawalThreshold(data.withdrawalThreshold)
+      } catch (error) {
+        console.error('Failed to fetch settings:', error)
+      }
+    }
+    fetchSettings()
+  }, [])
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <WalletBalance />
+        <WalletBalance 
+          initialBalance={user?.walletBalance || 0} 
+          withdrawalThreshold={withdrawalThreshold}
+        />
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>

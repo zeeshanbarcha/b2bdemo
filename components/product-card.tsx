@@ -1,5 +1,5 @@
-'use client'  
-  
+'use client'
+
 import Link from "next/link"
 import { Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -9,6 +9,8 @@ import { addToWishlist, getWishlist, removeFromWishlist } from "@/app/actions/wi
 import { useAuth } from "@/contexts/auth-context"
 import { toast } from "react-hot-toast"
 import { useEffect, useState } from "react"
+import { useCurrency } from "@/contexts/currency-context"
+import { formatPrice } from "@/lib/utils"
 
 interface ProductCardProps {
   product: {
@@ -23,6 +25,7 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const { user, refreshCounts } = useAuth()
   const [isInWishlist, setIsInWishlist] = useState(false)
+  const { currency, exchangeRates } = useCurrency()
   const discountedPrice = product.discount
     ? product.price * (1 - product.discount)
     : product.price
@@ -45,7 +48,7 @@ export function ProductCard({ product }: ProductCardProps) {
       toast.error("Please sign in to add items to your wishlist")
       return
     }
-    
+
     try {
       if (isInWishlist) {
         const result = await removeFromWishlist(product.id)
@@ -72,7 +75,7 @@ export function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <Card className="group relative h-full">
+    <Card className="group relative h-full overflow-hidden border-border bg-card">
       <Link href={`/products/${product.id}`}>
         <div className="flex h-full flex-col">
           <CardContent className="flex-none p-0">
@@ -85,14 +88,15 @@ export function ProductCard({ product }: ProductCardProps) {
                 className="h-full w-full object-cover transition-transform group-hover:scale-105"
               />
               {product.discount && (
-                <div className="absolute left-2 top-2 rounded-full bg-red-500 px-2 py-1 text-xs font-bold text-white">
+                <div className="absolute left-2 top-2 rounded-full bg-destructive px-2 py-1 text-xs font-bold text-destructive-foreground">
                   -{product.discount * 100}%
                 </div>
               )}
               <Button
                 variant="ghost"
                 size="icon"
-                className={`absolute right-2 top-2 z-20 ${isInWishlist ? 'text-red-500 hover:text-red-600' : ''}`}
+                className={`absolute right-2 top-2 z-20 hover:bg-background/80 ${isInWishlist ? 'text-destructive hover:text-destructive/80' : 'text-foreground/60 hover:text-foreground'
+                  }`}
                 onClick={handleWishlist}
               >
                 <Heart className="h-5 w-5" fill={isInWishlist ? "currentColor" : "none"} />
@@ -100,14 +104,14 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
           </CardContent>
           <CardFooter className="flex flex-1 flex-col items-start gap-2 p-4">
-            <h3 className="line-clamp-2 min-h-[40px] text-sm font-medium">
+            <h3 className="line-clamp-2 min-h-[40px] text-sm font-medium text-card-foreground">
               {product.name}
             </h3>
             <div className="mt-auto flex items-center gap-2">
-              <span className="font-bold">₹{discountedPrice.toFixed(2)}</span>
+              <span className="font-bold text-card-foreground">{formatPrice(discountedPrice, currency, exchangeRates)}</span>
               {product.discount && (
-                <span className="text-sm text-neutral-500 line-through dark:text-neutral-400">
-                  ₹{product.price.toFixed(2)}
+                <span className="text-sm text-muted-foreground line-through">
+                  {formatPrice(product.price, currency, exchangeRates)}
                 </span>
               )}
             </div>

@@ -49,12 +49,13 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
       }
 
       if (result.status === 201 && result.user) {
+        console.log(result.user)
         setUser(result.user)
         toast.success(result.message)
         reset()
         onSuccess()
         router.refresh()
-        router.push('/dashboard')
+        result.user.role === 'ADMIN' ? router.push('/admin') : router.push('/dashboard')
       } else {
         toast.error('Invalid response from server')
       }
