@@ -3,6 +3,14 @@ import prisma from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { cookies } from "next/headers";
 import { generateToken } from "@/auth";
+import { setCors } from "../../../lib/cors";
+
+
+export async function OPTIONS() {
+  const response = NextResponse.json({}, { status: 200 });
+  setCors(response);
+  return response;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,9 +52,12 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error while registering user:", error);
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: "Error while registering user" },
       { status: 500 }
     );
+
+    setCors(response);
+    return response;
   }
 }
