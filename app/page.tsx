@@ -94,7 +94,7 @@ function HomeContent() {
               Shop, Save, Earn
             </h1>
             <p className="mt-4 text-lg text-primary-foreground/90 md:text-xl">
-              Unlock Rewards with 7-Eleven India Online
+              Unlock Rewards with netflixn Online
             </p>
             <div className="mt-8 flex gap-4">
               <Link

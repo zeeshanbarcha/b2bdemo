@@ -69,7 +69,7 @@ export const categories = [
   },
   {
     id: "fashion",
-    name: "7-Eleven Fashion",
+    name: "Netflixn Fashion",
     icon: "shirt",
   },
   {

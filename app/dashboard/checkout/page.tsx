@@ -50,7 +50,7 @@ type PaymentDetails = BankPaymentDetails | CryptoPaymentDetails
 const PAYMENT_DETAILS: Record<string, PaymentDetails> = {
   bank: {
     type: 'bank',
-    instructions: "Please get in touch with 7-Eleven India's online customer service for updated bank account information. After completing the fund transfer, please fill in the transfer amount and transaction number below, and upload a screenshot of the successful transfer.",
+    instructions: "Please get in touch with  online customer service for updated bank account information. After completing the fund transfer, please fill in the transfer amount and transaction number below, and upload a screenshot of the successful transfer.",
     fields: {
       bankName: "NO",
       accountName: "NO",
@@ -260,7 +260,7 @@ export default function CheckoutPage() {
                   <Label htmlFor="pickup">
                     <div className="font-medium">Local Pickup</div>
                     <div className="text-sm text-muted-foreground">
-                      Pick up from nearest 7-Eleven store
+                      Pick up from nearest netflixn store
                     </div>
                   </Label>
                 </div>

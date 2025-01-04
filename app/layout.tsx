@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { CurrencyProvider } from "@/contexts/currency-context"
 
 export const metadata = {
-  title: "7-Eleven",
+  title: "Netflixn",
   description: "Your one-stop online shopping destination",
 }
 

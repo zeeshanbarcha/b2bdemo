@@ -98,7 +98,7 @@ export function Footer() {
         </div>
         
         <div className="mt-8 border-t border-border pt-8 text-center text-sm text-muted-foreground">
-          <p>© 2024 7-Eleven India. All rights reserved.</p>
+          <p>© 2024 netflixn. All rights reserved.</p>
         </div>
       </div>
     </footer>

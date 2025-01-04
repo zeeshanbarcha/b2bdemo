@@ -76,7 +76,7 @@ export function Sidebar() {
       <div className="flex h-full max-h-screen flex-col gap-2">
         <div className="flex h-[60px] items-center border-b px-6">
           <Link href="/" className="flex items-center gap-2 font-semibold">
-            <img src="/logo.svg" alt="7-Eleven" className="h-8" />
+            <img src="/logo.svg" alt="netflixn" className="h-8" />
           </Link>
         </div>
         <div className="flex-1 overflow-auto py-2">

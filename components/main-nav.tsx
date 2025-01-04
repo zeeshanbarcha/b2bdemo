@@ -47,7 +47,7 @@ export function MainNav() {
         <div className="flex h-16 items-center justify-between gap-4">
           <div className="flex items-center gap-6 lg:gap-8">
             <Link href="/" className="flex-shrink-0">
-              <span className="text-xl font-bold text-foreground">7-Eleven</span>
+              <span className="text-xl font-bold text-foreground uppercase">Netflix</span>
             </Link>
             <div className="hidden lg:flex lg:gap-6">
               <Link
