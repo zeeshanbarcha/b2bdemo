@@ -27,7 +27,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const [isInWishlist, setIsInWishlist] = useState(false)
   const { currency, exchangeRates } = useCurrency()
   const discountedPrice = product.discount
-    ? product.price * (1 - product.discount)
+    ? product.price * (1 - product.discount / 100)
     : product.price
 
   useEffect(() => {
@@ -89,7 +89,7 @@ export function ProductCard({ product }: ProductCardProps) {
               />
               {product.discount && (
                 <div className="absolute left-2 top-2 rounded-full bg-destructive px-2 py-1 text-xs font-bold text-destructive-foreground">
-                  -{product.discount * 100}%
+                  -{product.discount}%
                 </div>
               )}
               <Button

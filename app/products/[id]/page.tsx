@@ -148,7 +148,7 @@ export default function ProductPage({ params }: PageProps) {
     return notFound()
   }
 
-  const discountedPrice = product.price * (1 - (product.discount || 0))
+  const discountedPrice = product.price * (1 - (product.discount || 0) / 100)
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -156,10 +156,7 @@ export default function ProductPage({ params }: PageProps) {
         <ImageGallery images={product.images} productName={product.name} />
 
         <div className="flex flex-col gap-6">
-          <div>
-            <h1 className="text-3xl font-bold">{product.name}</h1>
-            <p className="mt-2 text-muted-foreground">{product.description}</p>
-          </div>
+          <h1 className="text-3xl font-bold">{product.name}</h1>
 
           <div className="flex items-center gap-2">
             <span className="text-3xl font-bold">
@@ -171,7 +168,7 @@ export default function ProductPage({ params }: PageProps) {
                   {displayPrice(product.price)}
                 </span>
                 <span className="rounded-full bg-red-500 px-2 py-1 text-xs font-semibold text-white">
-                  {product.discount * 100}% OFF
+                  {product.discount}% OFF
                 </span>
               </>
             )}
@@ -211,26 +208,34 @@ export default function ProductPage({ params }: PageProps) {
             )}
             {addingToCart ? "Adding to Cart..." : isInCart ? "Already in Cart" : "Add to Cart"}
           </Button>
-
-          {product.specifications && (
-            <div className="mt-8">
-              <h2 className="text-xl font-semibold">Specifications</h2>
-              <div className="mt-4 rounded-lg border">
-                <table className="w-full">
-                  <tbody>
-                    {Object.entries(product.specifications).map(([key, value]) => (
-                      <tr key={key} className="border-b last:border-0">
-                        <td className="px-4 py-2 font-medium">{key}</td>
-                        <td className="px-4 py-2">{value}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
         </div>
       </div>
+
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold mb-4">Description</h2>
+        <div
+          className="prose prose-neutral max-w-none rounded-lg border p-4 text-muted-foreground"
+          dangerouslySetInnerHTML={{ __html: product.description }}
+        />
+      </div>
+
+      {product.specifications && (
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold">Specifications</h2>
+          <div className="mt-4 rounded-lg border">
+            <table className="w-full">
+              <tbody>
+                {Object.entries(product.specifications).map(([key, value]) => (
+                  <tr key={key} className="border-b last:border-0">
+                    <td className="px-4 py-2 font-medium">{key}</td>
+                    <td className="px-4 py-2">{value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {relatedProducts.length > 0 && (
         <div className="mt-16">
