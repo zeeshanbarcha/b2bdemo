@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { categories, products } from '../config/products'
+import { categories } from '../config/products'
 
 const prisma = new PrismaClient()
 
@@ -19,20 +19,20 @@ async function main() {
   }
 
   // Create products
-  for (const product of products) {
-    await prisma.product.create({
-      data: {
-        id: product.id,
-        name: product.name,
-        description: `Description for ${product.name}`,
-        price: product.price,
-        images: product.images,
-        discount: product.discount,
-        inStock: 100,
-        categoryId: product.category,
-      },
-    })
-  }
+  // for (const product of products) {
+  //   await prisma.product.create({
+  //     data: {
+  //       id: product.id,
+  //       name: product.name,
+  //       description: `Description for ${product.name}`,
+  //       price: product.price,
+  //       images: product.images,
+  //       discount: product.discount,
+  //       inStock: 100,
+  //       categoryId: product.category,
+  //     },
+  //   })
+  // }
 }
 
 main()
