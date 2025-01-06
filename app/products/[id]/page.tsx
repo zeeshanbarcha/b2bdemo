@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { addToCart, checkCartItem, updateCartQuantity } from "@/app/actions/cart"
 import { useCurrency } from "@/contexts/currency-context"
 import { formatPrice } from "@/lib/utils"
+import { productReviews } from "@/config/products"
 
 interface Product {
   id: string
@@ -36,6 +37,22 @@ interface PageProps {
   params: {
     id: string
   }
+}
+
+interface CategoryReview {
+  category: string;
+  reviews: {
+    rating: number;
+    comment: string;
+    author: string;
+    date: string;
+  }[];
+}
+
+function getRandomReviews(reviews: any[], count: number) {
+  return [...reviews]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, Math.min(count, reviews.length));
 }
 
 function ProductSkeleton() {
@@ -150,6 +167,14 @@ export default function ProductPage({ params }: PageProps) {
 
   const discountedPrice = product.price * (1 - (product.discount || 0) / 100)
 
+  const categoryReviews = productReviews.find(
+    (review) => review.category === product.category.id
+  );
+
+  const displayReviews = categoryReviews
+    ? getRandomReviews(categoryReviews.reviews, 3)
+    : [];
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid gap-8 md:grid-cols-2">
@@ -208,6 +233,39 @@ export default function ProductPage({ params }: PageProps) {
             )}
             {addingToCart ? "Adding to Cart..." : isInCart ? "Already in Cart" : "Add to Cart"}
           </Button>
+
+          {categoryReviews && (
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
+              <div className="space-y-4">
+                {displayReviews.map((review, index) => (
+                  <div key={index} className="rounded-lg border p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="flex text-yellow-400">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-4 w-4 ${i < review.rating ? "fill-current" : ""
+                                }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="font-medium">{review.author}</span>
+                        {review.verified && (
+                          <span className="text-sm text-green-600">✓ Verified Purchase</span>
+                        )}
+                      </div>
+                      <span className="text-sm text-muted-foreground">
+                        {new Date(review.date).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-muted-foreground">{review.comment}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -243,32 +301,6 @@ export default function ProductPage({ params }: PageProps) {
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4">
             {relatedProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {product.reviews && (
-        <div className="mt-16">
-          <h2 className="mb-8 text-2xl font-bold">Customer Reviews</h2>
-          <div className="space-y-6">
-            {product.reviews.map((review, i) => (
-              <div key={i} className="rounded-lg border p-4">
-                <div className="flex items-center gap-2">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-4 w-4 ${
-                          i < review.rating ? "fill-current" : ""
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="font-medium">{review.name}</span>
-                </div>
-                <p className="mt-2 text-muted-foreground">{review.comment}</p>
-              </div>
             ))}
           </div>
         </div>

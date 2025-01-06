@@ -19,12 +19,14 @@ import {
 } from "@/components/ui/select"
 import { toast } from "react-hot-toast"
 import { UpdateUserModal } from "./update-user-modal"
+import { Input } from "@/components/ui/input"
 
 const USER_ROLES = ['USER', 'ADMIN']
 
 export default function UsersPage() {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
     fetchUsers()
@@ -59,6 +61,10 @@ export default function UsersPage() {
     }
   }
 
+  const filteredUsers = users.filter((user: any) =>
+    user.email.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
   if (loading) {
     return <div>Loading...</div>
   }
@@ -67,6 +73,14 @@ export default function UsersPage() {
     <div className="space-y-6">
       <h2 className="text-3xl font-bold tracking-tight">Users</h2>
       
+      <div className="max-w-sm">
+        <Input
+          placeholder="Search by email..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
       <Table>
         <TableHeader>
           <TableRow>
@@ -81,7 +95,7 @@ export default function UsersPage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map((user: any) => (
+          {filteredUsers.map((user: any) => (
             <TableRow key={user.id}>
               <TableCell className="flex items-center gap-3">
                 <Avatar className="h-8 w-8">
