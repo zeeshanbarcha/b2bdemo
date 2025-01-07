@@ -3,16 +3,17 @@
 import { notFound, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { ShoppingCart, Minus, Plus, Star, Loader2 } from "lucide-react"
+import { ShoppingCart, Minus, Plus, Star, Loader2, Heart } from "lucide-react"
 import { ProductCard } from "@/components/product-card"
 import { ImageGallery } from "@/components/image-gallery"
 import { useAuth } from "@/contexts/auth-context"
 import { toast } from "react-hot-toast"
 import { Skeleton } from "@/components/ui/skeleton"
-import { addToCart, checkCartItem, updateCartQuantity } from "@/app/actions/cart"
+import { addToCart, checkCartItem } from "@/app/actions/cart"
 import { useCurrency } from "@/contexts/currency-context"
 import { formatPrice } from "@/lib/utils"
 import { productReviews } from "@/config/products"
+import { addToWishlist, checkWishlistItem } from "@/app/actions/wishlist"
 
 interface Product {
   id: string
@@ -80,6 +81,8 @@ export default function ProductPage({ params }: PageProps) {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const [addingToCart, setAddingToCart] = useState(false)
   const [isInCart, setIsInCart] = useState(false)
+  const [addingToWishlist, setAddingToWishlist] = useState(false)
+  const [isInWishlist, setIsInWishlist] = useState(false)
 
   const displayPrice = (price: number) => formatPrice(price, currency, exchangeRates)
 
@@ -87,12 +90,18 @@ export default function ProductPage({ params }: PageProps) {
     fetchProduct()
     if (user) {
       checkIfInCart()
+      checkIfInWishlist()
     }
   }, [params.id, user])
 
   const checkIfInCart = async () => {
     const existingItem = await checkCartItem(params.id)
     setIsInCart(!!existingItem)
+  }
+
+  const checkIfInWishlist = async () => {
+    const existingItem = await checkWishlistItem(params.id)
+    setIsInWishlist(!!existingItem)
   }
 
   const fetchProduct = async () => {
@@ -153,6 +162,30 @@ export default function ProductPage({ params }: PageProps) {
     }
   }
 
+  const handleAddToWishlist = async () => {
+    if (!user) {
+      toast.error("Please sign in to add items to wishlist")
+      return
+    }
+
+    if (!product) return
+
+    try {
+      setAddingToWishlist(true)
+      const result = await addToWishlist(product.id)
+      if (result.success) {
+        toast.success("Added to wishlist successfully")
+        setIsInWishlist(true)
+      } else {
+        toast.error(result.error || "Failed to add to wishlist")
+      }
+    } catch (error) {
+      toast.error("Failed to add to wishlist")
+    } finally {
+      setAddingToWishlist(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -181,7 +214,18 @@ export default function ProductPage({ params }: PageProps) {
         <ImageGallery images={product.images} productName={product.name} />
 
         <div className="flex flex-col gap-6">
-          <h1 className="text-3xl font-bold">{product.name}</h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-3xl font-bold">{product.name}</h1>
+          </div>
+
+          <button
+            onClick={handleAddToWishlist}
+            disabled={addingToWishlist || isInWishlist}
+            className="flex items-center gap-2 text-muted-foreground hover:text-primary cursor-pointer"
+          >
+            <Heart className={`h-5 w-5 ${isInWishlist ? "fill-current text-red-500" : ""}`} />
+            <p>{isInWishlist ? "Added to wishlist" : "Add to wishlist"}</p>
+          </button>
 
           <div className="flex items-center gap-2">
             <span className="text-3xl font-bold">

@@ -72,4 +72,28 @@ export async function getWishlist() {
     console.error("Error fetching wishlist:", error)
     return { success: false, error: "Failed to fetch wishlist" }
   }
+}
+
+export async function checkWishlistItem(productId: string) {
+  try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return null
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: String(session.user.id) },
+      include: {
+        wishlist: {
+          where: { id: productId },
+          select: { id: true }
+        }
+      }
+    })
+
+    return user?.wishlist[0] || null
+  } catch (error) {
+    console.error("Error checking wishlist item:", error)
+    return null
+  }
 } 
