@@ -35,7 +35,7 @@ function ProductsListContent() {
   const router = useRouter()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(parseInt(searchParams.get("page") || "1"))
   const [totalPages, setTotalPages] = useState(1)
   const [category, setCategory] = useState(searchParams.get("category") || "all")
   const [sort, setSort] = useState("newest")
@@ -44,6 +44,11 @@ function ProductsListContent() {
   useEffect(() => {
     fetchProducts()
   }, [page, category, sort, query])
+
+  useEffect(() => {
+    const pageParam = parseInt(searchParams.get("page") || "1")
+    setPage(pageParam)
+  }, [searchParams])
 
   const fetchProducts = async () => {
     try {
@@ -73,6 +78,10 @@ function ProductsListContent() {
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setPage(newPage)
+      // Update URL with new page number
+      const params = new URLSearchParams(searchParams)
+      params.set("page", newPage.toString())
+      router.push(`?${params.toString()}`)
       // Scroll to top when changing pages
       window.scrollTo(0, 0)
     }
