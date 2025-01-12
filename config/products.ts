@@ -436,7 +436,7 @@ export const productReviews = [
       { rating: 4, comment: "Great performance for the price.", author: "Harper Edwards", date: "2024-04-11", verified: true },
       { rating: 3, comment: "The fan gets loud at times.", author: "Grace Rivera", date: "2024-04-12", verified: false },
       { rating: 4, comment: "Good for work and play.", author: "Benjamin Gonzalez", date: "2024-04-13", verified: true },
-      { rating: 5, comment: "Handles large projects with ease.", author: "Chloe Green", date: "2024-04-14", verified: true }
+      { rating: 5, comment: "Handles large projects with ease. ", author: "Chloe Green", date: "2024-04-14", verified: true }
     ]
   }
 ];
