@@ -1,6 +1,8 @@
 "use client"
 
 import dynamic from 'next/dynamic'
+import { useLanguage } from "@/contexts/language-context"
+import { translations } from "@/lib/translations"
 
 // Dynamically import ProductsList with SSR disabled
 const DynamicProductsList = dynamic(
@@ -24,11 +26,14 @@ const DynamicProductsList = dynamic(
 )
 
 export default function ProductsPage() {
+  const { language } = useLanguage()
+  const t = translations[language]
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">All Products</h1>
-        <p className="mt-2 text-muted-foreground">Browse our collection of products</p>
+        <h1 className="text-3xl font-bold">{t.products.title}</h1>
+        <p className="mt-2 text-muted-foreground">{t.products.subtitle}</p>
       </div>
       <DynamicProductsList />
     </div>

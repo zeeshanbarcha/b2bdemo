@@ -5,18 +5,20 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-type Currency = "USD" | "SDG" | "INR"
+type Currency = "USD" | "SDG" | "INR" | "AED"
 
 const DEFAULT_EXCHANGE_RATES: Record<Currency, number> = {
   USD: 1,
   SDG: 601.05,
   INR: 85.79,
+  AED: 3.67,
 }
 
 const CURRENCY_SYMBOLS: Record<Currency, string> = {
   USD: "$",
   SDG: "SDG",
-  INR: "₹"
+  INR: "₹",
+  AED: "AED",
 }
 
 export function formatPrice(

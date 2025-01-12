@@ -1,9 +1,13 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Wallet, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { WithdrawModal } from "./withdraw-modal"
 import { useCurrency } from "@/contexts/currency-context"
+import { useLanguage } from "@/contexts/language-context"
+import { translations } from "@/lib/translations"
 import { formatPrice } from "@/lib/utils"
 
 interface WalletBalanceProps {
@@ -23,6 +27,8 @@ export function WalletBalance({
   withdrawalThreshold = 1500 
 }: WalletBalanceProps) {
   const { currency, exchangeRates } = useCurrency()
+  const { language } = useLanguage()
+  const t = translations[language]
   const [balance, setBalance] = useState(initialBalance)
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
   const [lastWithdrawal, setLastWithdrawal] = useState<LastWithdrawal | null>(null)
@@ -115,7 +121,7 @@ export function WalletBalance({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">
-          Wallet Balance
+          {t.dashboard.walletBalance}
         </CardTitle>
         <Wallet className="h-4 w-4 text-neutral-600" />
       </CardHeader>
@@ -127,14 +133,14 @@ export function WalletBalance({
           <span className={percentageChange > 0 ? "text-green-600" : "text-red-600"}>
             {percentageChange > 0 ? '+' : ''}{percentageChange}%
           </span>
-          {' '}from last month
+          {' '}{t.dashboard.fromLastMonth}
         </p>
 
         {lastWithdrawal && (
           <div className="mt-2 space-y-1 border-t pt-2">
             <div className="flex items-center gap-1 text-xs">
               <Clock className="h-3 w-3" />
-              <span className="text-neutral-600">Last withdrawal:</span>
+              <span className="text-neutral-600">{t.dashboard.lastWithdrawal}:</span>
             </div>
             <div className="flex items-center justify-between text-xs">
               <span>{formatPrice(lastWithdrawal.amount, currency, exchangeRates)}</span>
@@ -145,14 +151,14 @@ export function WalletBalance({
             {lastWithdrawal.reason && lastWithdrawal.status === 'REJECTED' && (
               <div className="mt-1 rounded-md bg-red-50 p-2">
                 <p className="text-xs text-red-600">
-                  Rejection reason: {lastWithdrawal.reason}
+                  {t.dashboard.rejectionReason}: {lastWithdrawal.reason}
                 </p>
               </div>
             )}
             {lastWithdrawal.status === 'APPROVED' && (
               <div className="mt-1 rounded-md bg-green-50 p-2">
                 <p className="text-xs text-green-600">
-                  Your withdrawal has been approved and processed
+                  {t.dashboard.withdrawalApproved}
                 </p>
               </div>
             )}
@@ -165,11 +171,11 @@ export function WalletBalance({
           onClick={() => setShowWithdrawModal(true)}
           disabled={balance < withdrawalThreshold}
         >
-          Withdraw Funds
+          {t.dashboard.withdrawFunds}
         </Button>
         {balance < withdrawalThreshold && (
           <p className="mt-2 text-xs text-neutral-600">
-            Minimum withdrawal amount is {formatPrice(withdrawalThreshold, currency, exchangeRates)}
+            {t.dashboard.minimumWithdrawal} {formatPrice(withdrawalThreshold, currency, exchangeRates)}
           </p>
         )}
       </CardContent>

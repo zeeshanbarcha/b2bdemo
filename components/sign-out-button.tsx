@@ -4,15 +4,20 @@ import { LogOut } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { useRouter } from "next/navigation"
 import { toast } from "react-hot-toast"
+import { useLanguage } from "@/contexts/language-context"
+import { translations } from "@/lib/translations"
 
 export function SignOutButton() {
   const { logout } = useAuth()
   const router = useRouter()
+  const { language } = useLanguage()
+  const t = translations[language]?.common || translations.en.common
+  const nav = translations[language]?.nav || translations.en.nav
 
   const handleLogout = () => {
     logout()
     router.push('/')
-    toast.success('Logged out successfully')
+    toast.success(t.messages.logoutSuccess)
   }
 
   return (
@@ -21,7 +26,7 @@ export function SignOutButton() {
       onClick={handleLogout}
     >
       <LogOut className="h-4 w-4" />
-      Sign Out
+      {nav.logout}
     </button>
   )
 }

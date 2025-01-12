@@ -14,11 +14,17 @@ import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import { settingsSchema, type SettingsFormData } from "@/app/validations/settings"
 import { cn } from "@/lib/utils"
+import { useLanguage } from "@/contexts/language-context"
+import { translations } from "@/lib/translations"
 
 export default function SettingsPage() {
   const { user, refreshUser } = useAuth()
   const [loading, setLoading] = useState(false)
   const [imageLoading, setImageLoading] = useState(false)
+  const { language } = useLanguage()
+  const t = translations[language]?.dashboard?.settings || translations?.en?.dashboard.settings
+  const commonT = translations[language]?.common || translations.en.common
+  const authT = translations[language]?.auth || translations.en.auth
 
   const {
     register,
@@ -75,7 +81,7 @@ export default function SettingsPage() {
       })
       
       if (result.success) {
-        toast.success("Settings updated successfully")
+        toast.success(t.messages.updateSuccess)
         
         // First update the local form state
         if (result.data) {
@@ -99,11 +105,11 @@ export default function SettingsPage() {
         // Then refresh the global user state
         await refreshUser()
       } else {
-        toast.error(result.error || "Failed to update settings")
+        toast.error(result.error || t.messages.updateError)
       }
     } catch (error) {
       console.error("Update error:", error)
-      toast.error("Failed to update settings")
+      toast.error(t.messages.updateError)
     } finally {
       setLoading(false)
     }
@@ -116,12 +122,12 @@ export default function SettingsPage() {
     e.target.value = ''
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("File size must be less than 5MB")
+      toast.error(t.messages.uploadError.size)
       return
     }
 
     if (!file.type.startsWith('image/')) {
-      toast.error("Please upload an image file")
+      toast.error(t.messages.uploadError.type)
       return
     }
 
@@ -163,7 +169,7 @@ export default function SettingsPage() {
       })
 
       if (result.success) {
-        toast.success("Profile picture updated successfully")
+        toast.success(t.messages.pictureSuccess)
         await refreshUser() // Wait for the refresh to complete
         
         // Re-set form values after refresh to ensure consistency
@@ -181,36 +187,36 @@ export default function SettingsPage() {
           setValue("country", result.data.country || "")
         }
       } else {
-        toast.error(result.error || "Failed to update profile picture")
+        toast.error(result.error || t.messages.pictureError)
       }
     } catch (error) {
       console.error("Upload error:", error)
-      toast.error(error instanceof Error ? error.message : "Failed to upload image")
+      toast.error(error instanceof Error ? error.message : t.messages.uploadError.generic)
     } finally {
       setImageLoading(false)
     }
   }
 
   if (!user) {
-    return <div>Please log in to view settings</div>
+    return <div>{authT.pleaseLogin}</div>
   }
 
   return (
     <Suspense>
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-neutral-500">Manage your account settings</p>
+        <h1 className="text-3xl font-bold">{t.title}</h1>
+        <p className="text-neutral-500">{t.subtitle}</p>
       </div>
 
       <div className="grid gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
+            <CardTitle>{t.profileInfo}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2 mb-4">
-              <Label>Profile Picture</Label>
+              <Label>{t.profilePicture}</Label>
               <div className="relative w-fit">
                 <Avatar 
                   className={cn(
@@ -248,7 +254,7 @@ export default function SettingsPage() {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="firstName">{t.firstName}</Label>
                 <Input 
                   id="firstName"
                   {...register("firstName")}
@@ -259,7 +265,7 @@ export default function SettingsPage() {
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
+                <Label htmlFor="lastName">{t.lastName}</Label>
                 <Input 
                   id="lastName"
                   {...register("lastName")}
@@ -271,7 +277,7 @@ export default function SettingsPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t.email}</Label>
               <Input 
                 id="email"
                 type="email"
@@ -285,7 +291,7 @@ export default function SettingsPage() {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">{t.phone}</Label>
               <Input id="phone" type="tel" {...register("phone")} />
             </div>
           </CardContent>
@@ -293,30 +299,30 @@ export default function SettingsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Address Information</CardTitle>
+            <CardTitle>{t.addressInfo}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="address">Street Address</Label>
+              <Label htmlFor="address">{t.streetAddress}</Label>
               <Input id="address" {...register("address")} />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="city">City</Label>
+                <Label htmlFor="city">{t.city}</Label>
                 <Input id="city" {...register("city")} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="state">State</Label>
+                <Label htmlFor="state">{t.state}</Label>
                 <Input id="state" {...register("state")} />
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="zipCode">ZIP Code</Label>
+                <Label htmlFor="zipCode">{t.zipCode}</Label>
                 <Input id="zipCode" {...register("zipCode")} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="country">Country</Label>
+                <Label htmlFor="country">{t.country}</Label>
                 <Input id="country" {...register("country")} />
               </div>
             </div>
@@ -325,27 +331,27 @@ export default function SettingsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Notifications</CardTitle>
+            <CardTitle>{t.notifications.title}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Email Notifications</p>
+                  <p className="font-medium">{t.notifications.email.title}</p>
                   <p className="text-sm text-neutral-500">
-                    Receive order updates and promotions
+                    {t.notifications.email.description}
                   </p>
                 </div>
-                <Button variant="outline">Configure</Button>
+                <Button variant="outline">{t.notifications.configure}</Button>
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">SMS Notifications</p>
+                  <p className="font-medium">{t.notifications.sms.title}</p>
                   <p className="text-sm text-neutral-500">
-                    Receive delivery updates via SMS
+                    {t.notifications.sms.description}
                   </p>
                 </div>
-                <Button variant="outline">Configure</Button>
+                <Button variant="outline">{t.notifications.configure}</Button>
               </div>
             </div>
           </CardContent>
@@ -356,10 +362,10 @@ export default function SettingsPage() {
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
+                {commonT.loading}
               </>
             ) : (
-              "Save Changes"
+              commonT.save
             )}
           </Button>
         </div>

@@ -5,6 +5,8 @@ import { useAuth } from "@/contexts/auth-context"
 import { Bell } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
+import { useLanguage } from "@/contexts/language-context"
+import { translations } from "@/lib/translations"
 
 interface Notification {
   id: string
@@ -17,6 +19,8 @@ interface Notification {
 
 export default function NotificationsPage() {
   const { user } = useAuth()
+  const { language } = useLanguage()
+  const t = translations[language]
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -31,7 +35,7 @@ export default function NotificationsPage() {
       const data = await response.json()
       setNotifications(data)
     } catch (error) {
-      toast.error("Failed to fetch notifications")
+      toast.error(t.common.error)
     } finally {
       setLoading(false)
     }
@@ -46,35 +50,34 @@ export default function NotificationsPage() {
       })
       if (!response.ok) throw new Error()
 
-      // Update local state
       setNotifications(notifications.map(notification =>
         notification.id === id ? { ...notification, read: true } : notification
       ))
     } catch (error) {
-      toast.error("Failed to mark notification as read")
+      toast.error(t.dashboard.failedToMarkAsRead)
     }
   }
 
   if (!user) {
-    return <div>Please log in to view notifications</div>
+    return <div>{t.auth.pleaseLogin}</div>
   }
 
   if (loading) {
-    return <div>Loading notifications...</div>
+    return <div>{t.common.loading}</div>
   }
 
   return (
     <div className="space-y-6 p-6">
       <div>
-        <h1 className="text-3xl font-bold">Notifications</h1>
-        <p className="text-neutral-500">View your recent notifications</p>
+        <h1 className="text-3xl font-bold">{t.dashboard.notifications}</h1>
+        <p className="text-neutral-500">{t.dashboard.viewNotifications}</p>
       </div>
 
       <div className="space-y-4">
         {notifications.length === 0 ? (
           <Card>
             <CardContent className="p-6 text-center text-neutral-500">
-              No notifications to display
+              {t.dashboard.noNotifications}
             </CardContent>
           </Card>
         ) : (
@@ -92,7 +95,7 @@ export default function NotificationsPage() {
                   <div className="flex items-center justify-between">
                     <h3 className="font-medium">{notification.title}</h3>
                     <span className="text-sm text-neutral-500">
-                      {new Date(notification.createdAt).toLocaleDateString()}
+                      {new Date(notification.createdAt).toLocaleDateString(language)}
                     </span>
                   </div>
                   <p className="text-sm text-neutral-600">{notification.message}</p>

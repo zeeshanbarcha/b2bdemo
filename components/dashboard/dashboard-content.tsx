@@ -7,12 +7,16 @@ import { ProfileDetails } from "@/components/dashboard/profile-details"
 import { Suspense, useEffect, useState } from "react"
 import { getCartCount, getWishlistCount } from "@/app/actions/cart"
 import { useAuth } from "@/contexts/auth-context"
+import { useLanguage } from "@/contexts/language-context"
+import { translations } from "@/lib/translations"
 
 export function DashboardContent() {
   const [cartCount, setCartCount] = useState(0)
   const [wishlistCount, setWishlistCount] = useState(0)
   const [withdrawalThreshold, setWithdrawalThreshold] = useState(1500)
   const { user } = useAuth()
+  const { language } = useLanguage()
+  const t = translations[language]
 
   useEffect(() => {
     const fetchCounts = async () => {
@@ -43,7 +47,7 @@ export function DashboardContent() {
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+        <h2 className="text-3xl font-bold tracking-tight">{t.dashboard.dashboard}</h2>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <WalletBalance 
@@ -52,7 +56,7 @@ export function DashboardContent() {
         />
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.dashboard.orders}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{cartCount}</div>
@@ -60,7 +64,7 @@ export function DashboardContent() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Wishlist Items</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.dashboard.wishlist}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{wishlistCount}</div>
@@ -70,7 +74,7 @@ export function DashboardContent() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
           <CardHeader>
-            <CardTitle>Recent Orders</CardTitle>
+            <CardTitle>{t.dashboard.recentOrders}</CardTitle>
           </CardHeader>
           <CardContent>
             <Suspense fallback={<OrdersSkeleton />}>
@@ -80,7 +84,7 @@ export function DashboardContent() {
         </Card>
         <Card className="col-span-3">
           <CardHeader>
-            <CardTitle>Profile Details</CardTitle>
+            <CardTitle>{t.dashboard.manageProfile}</CardTitle>
           </CardHeader>
           <CardContent>
             <Suspense fallback={<ProfileSkeleton />}>

@@ -13,6 +13,8 @@ import {
   LucideIcon 
 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
+import { useLanguage } from "@/contexts/language-context"
+import { translations } from "@/lib/translations"
 
 interface Category {
   id: string
@@ -30,11 +32,14 @@ const iconMap: Record<string, LucideIcon> = {
 }
 
 export default function CategoriesPage() {
+  const { language } = useLanguage()
+  const t = translations[language]
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Categories</h1>
-        <p className="mt-2 text-muted-foreground">Browse products by category</p>
+        <h1 className="text-3xl font-bold">{t.nav.categories}</h1>
+        <p className="mt-2 text-muted-foreground">{t.home.sections.categories}</p>
       </div>
       <Suspense fallback={<CategoriesSkeleton />}>
         <CategoriesContent />
@@ -59,6 +64,8 @@ function CategoriesSkeleton() {
 }
 
 function CategoriesContent() {
+  const { language } = useLanguage()
+  const t = translations[language]
   const [categories, setCategories] = useState<Category[]>([])
 
   useEffect(() => {
@@ -79,13 +86,14 @@ function CategoriesContent() {
     <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {categories.map((category) => {
         const Icon = iconMap[category.id] || Laptop
+        const translatedName = t.categories[category.id as keyof typeof t.categories] || category.name
 
         return (
           <Link key={category.id} href={`/products?category=${category.id}`}>
             <Card className="transition-colors hover:bg-muted/50">
               <CardContent className="flex flex-col items-center p-6">
                 <Icon className="h-12 w-12" />
-                <h3 className="mt-4 font-medium">{category.name}</h3>
+                <h3 className="mt-4 font-medium">{translatedName}</h3>
               </CardContent>
             </Card>
           </Link>
