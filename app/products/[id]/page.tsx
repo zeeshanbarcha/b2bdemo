@@ -40,16 +40,6 @@ interface PageProps {
   }
 }
 
-interface CategoryReview {
-  category: string;
-  reviews: {
-    rating: number;
-    comment: string;
-    author: string;
-    date: string;
-  }[];
-}
-
 function getRandomReviews(reviews: any[], count: number) {
   return [...reviews]
     .sort(() => Math.random() - 0.5)
