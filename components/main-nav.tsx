@@ -139,7 +139,20 @@ export function MainNav() {
                 </DropdownMenu>
               </>
             ) : (
-              <Button onClick={() => setShowAuthModal(true)}>Sign In</Button>
+              <>
+                <Link 
+                  href="/auth/sign-in"
+                  className="text-sm font-medium text-foreground transition-colors hover:text-primary"
+                >
+                  Sign In
+                </Link>
+                <Link 
+                  href="/auth/sign-up"
+                  className="text-sm font-medium text-background bg-primary hover:bg-primary/90 dark:hover:bg-primary/80 px-4 py-2 rounded-md transition-colors"
+                >
+                  Sign Up
+                </Link>
+              </>
             )}
           </div>
         </div>

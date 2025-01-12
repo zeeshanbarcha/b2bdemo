@@ -12,6 +12,7 @@ import { useCurrency } from "@/contexts/currency-context"
 const CURRENCIES = [
   { id: "USD", label: "USD ($)" },
   { id: "SDG", label: "SDG (SDG)" },
+  { id: "AED", label: "AED (AED)" },
   // { id: "INR", label: "INR (₹)" },
 ] as const
 

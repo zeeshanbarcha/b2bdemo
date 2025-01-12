@@ -1,7 +1,9 @@
-import { Loader2, LucideProps } from "lucide-react"
+import { Loader2, LogIn, UserPlus } from "lucide-react"
 
 export const Icons = {
   spinner: Loader2,
+  login: LogIn,
+  userPlus: UserPlus,
   google: ({ ...props }: React.ComponentProps<"svg">) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 24" {...props}>
       <path

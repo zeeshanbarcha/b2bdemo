@@ -1,9 +1,9 @@
 import "./globals.css"
 import { Toaster } from "react-hot-toast"
 import { AuthProvider } from "@/contexts/auth-context"
-import { RootLayoutContent } from "@/components/root-layout-content"
 import { ThemeProvider } from "@/components/theme-provider"
 import { CurrencyProvider } from "@/contexts/currency-context"
+import { AuthLayoutWrapper } from "@/components/auth-layout-wrapper"
 
 export const metadata = {
   title: "Netflixn",
@@ -29,7 +29,6 @@ export default function RootLayout({
                   
                   document.documentElement.classList.add(theme === 'system' ? systemTheme : theme || systemTheme)
                   
-                  // Add this to prevent flash
                   document.documentElement.style.colorScheme = theme === 'dark' || (theme === 'system' && systemTheme === 'dark') ? 'dark' : 'light'
                 } catch (e) {}
               })()
@@ -46,9 +45,9 @@ export default function RootLayout({
         >
           <CurrencyProvider>
             <AuthProvider>
-              <RootLayoutContent>
+              <AuthLayoutWrapper>
                 {children}
-              </RootLayoutContent>
+              </AuthLayoutWrapper>
               <Toaster position="top-center" />
             </AuthProvider>
           </CurrencyProvider>

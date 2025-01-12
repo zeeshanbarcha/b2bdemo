@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react"
 
-type Currency = "USD" | "SDG" | "INR"
+type Currency = "USD" | "SDG" | "INR" | "AED"
 
 interface CurrencyContextType {
   currency: Currency
@@ -16,6 +16,7 @@ const DEFAULT_EXCHANGE_RATES: Record<Currency, number> = {
   USD: 1,
   SDG: 601.05,
   INR: 85.79,
+  AED: 3.67,
 }
 
 const STORAGE_KEY = 'app-currency'
@@ -24,7 +25,7 @@ function getInitialCurrency(): Currency {
   if (typeof window === 'undefined') return 'USD'
   try {
     const stored = localStorage.getItem(STORAGE_KEY) as Currency
-    return stored && ['USD', 'SDG', 'INR'].includes(stored) ? stored : 'USD'
+    return stored && ['USD', 'SDG', 'INR', 'AED'].includes(stored) ? stored : 'USD'
   } catch {
     return 'USD'
   }
