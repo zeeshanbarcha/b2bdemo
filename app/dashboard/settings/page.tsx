@@ -24,6 +24,7 @@ export default function SettingsPage() {
   const { language } = useLanguage()
   const t = translations[language]?.dashboard?.settings || translations?.en?.dashboard.settings
   const commonT = translations[language]?.common || translations.en.common
+  const authT = translations[language]?.auth || translations.en.auth
 
   const {
     register,
@@ -197,7 +198,7 @@ export default function SettingsPage() {
   }
 
   if (!user) {
-    return <div>{t.pleaseLogin}</div>
+    return <div>{authT.pleaseLogin}</div>
   }
 
   return (

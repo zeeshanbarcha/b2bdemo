@@ -57,7 +57,7 @@ export function OrdersContent() {
       'DELIVERED': 'bg-green-100 text-green-800',
       'CANCELLED': 'bg-red-100 text-red-800'
     }
-    return colors[status] || colors.PENDING
+    return colors[status as keyof typeof colors] || colors.PENDING
   }
 
   if (loading) {
