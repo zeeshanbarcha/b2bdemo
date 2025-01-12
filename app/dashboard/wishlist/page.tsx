@@ -13,6 +13,8 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { formatPrice } from "@/lib/utils"
 import { useCurrency } from "@/contexts/currency-context"
+import { useLanguage } from "@/contexts/language-context"
+import { translations } from "@/lib/translations"
 
 export default function WishlistPage() {
   return (
@@ -55,10 +57,12 @@ function WishlistSkeleton() {
 function WishlistContent() {
   const router = useRouter()
   const { refreshCounts } = useAuth()
+  const { currency, exchangeRates } = useCurrency()
+  const { language } = useLanguage()
+  const t = translations[language]
   const [wishlistItems, setWishlistItems] = useState<Product[]>([])
   const [addingToCart, setAddingToCart] = useState<Record<string, boolean>>({})
   const [inCartItems, setInCartItems] = useState<Record<string, boolean>>({})
-  const { currency, exchangeRates } = useCurrency()
 
   const checkCartStatus = async (productId: string) => {
     const cartItem = await checkCartItem(productId)
@@ -120,9 +124,9 @@ function WishlistContent() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Wishlist</h1>
+        <h1 className="text-3xl font-bold">{t.dashboard.wishlist}</h1>
         <p className="text-neutral-500">
-          {wishlistItems.length} items in your wishlist
+          {wishlistItems.length} {t.dashboard.itemsInWishlist}
         </p>
       </div>
 
@@ -143,7 +147,7 @@ function WishlistContent() {
                   <h3 className="font-medium">{item.name}</h3>
                   <p className="font-bold">{formatPrice(item.price, currency, exchangeRates)}</p>
                   {item.inStock === 0 && (
-                    <p className="text-sm text-red-600">Out of stock</p>
+                    <p className="text-sm text-red-600">{t.products.outOfStock}</p>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
@@ -154,7 +158,7 @@ function WishlistContent() {
                     onClick={() => handleRemoveFromWishlist(item.id)}
                   >
                     <Trash2 className="h-4 w-4" />
-                    <span className="sr-only">Remove from wishlist</span>
+                    <span className="sr-only">{t.dashboard.removeFromWishlist}</span>
                   </Button>
                   <Button
                     size="sm"
@@ -168,10 +172,10 @@ function WishlistContent() {
                       <ShoppingCart className="h-4 w-4" />
                     )}
                     {addingToCart[item.id] 
-                      ? "Adding..." 
+                      ? t.cart.adding
                       : inCartItems[item.id] 
-                        ? "In Cart" 
-                        : "Add to Cart"}
+                        ? t.cart.inCart
+                        : t.cart.addToCart}
                   </Button>
                 </div>
               </div>

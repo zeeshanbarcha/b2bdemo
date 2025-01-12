@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { toast } from "react-hot-toast"
 import { Loader2 } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
+import { translations } from "@/lib/translations"
 
 interface AddBankModalProps {
   open: boolean
@@ -15,6 +17,8 @@ interface AddBankModalProps {
 }
 
 export function AddBankModal({ open, onOpenChange, onSuccess }: AddBankModalProps) {
+  const { language } = useLanguage()
+  const t = translations[language]
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     bankName: "",
@@ -36,7 +40,7 @@ export function AddBankModal({ open, onOpenChange, onSuccess }: AddBankModalProp
 
       if (!response.ok) throw new Error()
       
-      toast.success("Bank account added successfully")
+      toast.success(t.dashboard.banks.addSuccess)
       onSuccess()
       onOpenChange(false)
       setFormData({
@@ -46,7 +50,7 @@ export function AddBankModal({ open, onOpenChange, onSuccess }: AddBankModalProp
         routingNumber: ""
       })
     } catch (error) {
-      toast.error("Failed to add bank account")
+      toast.error(t.dashboard.banks.addError)
     } finally {
       setLoading(false)
     }
@@ -56,40 +60,44 @@ export function AddBankModal({ open, onOpenChange, onSuccess }: AddBankModalProp
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Bank Account</DialogTitle>
+          <DialogTitle>{t.dashboard.banks.addBank}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="bankName">Bank Name</Label>
+            <Label htmlFor="bankName">{t.dashboard.banks.form.bankNameLabel}</Label>
             <Input
               id="bankName"
+              placeholder={t.dashboard.banks.form.bankNamePlaceholder}
               value={formData.bankName}
               onChange={e => setFormData(prev => ({ ...prev, bankName: e.target.value }))}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="accountName">Account Name</Label>
+            <Label htmlFor="accountName">{t.dashboard.banks.form.accountNameLabel}</Label>
             <Input
               id="accountName"
+              placeholder={t.dashboard.banks.form.accountNamePlaceholder}
               value={formData.accountName}
               onChange={e => setFormData(prev => ({ ...prev, accountName: e.target.value }))}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="accountNumber">Account Number</Label>
+            <Label htmlFor="accountNumber">{t.dashboard.banks.form.accountNumberLabel}</Label>
             <Input
               id="accountNumber"
+              placeholder={t.dashboard.banks.form.accountNumberPlaceholder}
               value={formData.accountNumber}
               onChange={e => setFormData(prev => ({ ...prev, accountNumber: e.target.value }))}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="routingNumber">Routing Number</Label>
+            <Label htmlFor="routingNumber">{t.dashboard.banks.form.routingNumberLabel}</Label>
             <Input
               id="routingNumber"
+              placeholder={t.dashboard.banks.form.routingNumberPlaceholder}
               value={formData.routingNumber}
               onChange={e => setFormData(prev => ({ ...prev, routingNumber: e.target.value }))}
               required
@@ -99,10 +107,10 @@ export function AddBankModal({ open, onOpenChange, onSuccess }: AddBankModalProp
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Adding...
+                {t.common.loading}
               </>
             ) : (
-              "Add Bank Account"
+              t.dashboard.banks.addBank
             )}
           </Button>
         </form>

@@ -4,6 +4,8 @@ import { useEffect, useState, Suspense } from "react"
 import { ProductCard } from "@/components/product-card"
 import { Card, CardContent } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
+import { translations } from "@/lib/translations"
 
 interface Product {
   id: string
@@ -18,6 +20,9 @@ interface Product {
 }
 
 export default function DealsPage() {
+  const { language } = useLanguage()
+  const t = translations[language]
+
   return (
     <Suspense fallback={<DealsSkeleton />}>
       <DealsContent />
@@ -50,6 +55,8 @@ function DealsSkeleton() {
 }
 
 function DealsContent() {
+  const { language } = useLanguage()
+  const t = translations[language]
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -81,9 +88,9 @@ function DealsContent() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="space-y-2 mb-8">
-        <h1 className="text-3xl font-bold">Featured Deals</h1>
+        <h1 className="text-3xl font-bold">{t.products.deals}</h1>
         <p className="text-neutral-500">
-          {products.length} products available
+          {products.length} {t.products.available}
         </p>
       </div>
 
@@ -93,7 +100,7 @@ function DealsContent() {
         ))}
         {products.length === 0 && (
           <div className="col-span-full text-center py-12 text-neutral-500">
-            No deals available at the moment
+            {t.products.noDealsAvailable}
           </div>
         )}
       </div>

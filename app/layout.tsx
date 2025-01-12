@@ -3,6 +3,7 @@ import { Toaster } from "react-hot-toast"
 import { AuthProvider } from "@/contexts/auth-context"
 import { ThemeProvider } from "@/components/theme-provider"
 import { CurrencyProvider } from "@/contexts/currency-context"
+import { LanguageProvider } from "@/contexts/language-context"
 import { AuthLayoutWrapper } from "@/components/auth-layout-wrapper"
 
 export const metadata = {
@@ -43,14 +44,16 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <CurrencyProvider>
-            <AuthProvider>
-              <AuthLayoutWrapper>
-                {children}
-              </AuthLayoutWrapper>
-              <Toaster position="top-center" />
-            </AuthProvider>
-          </CurrencyProvider>
+          <LanguageProvider>
+            <CurrencyProvider>
+              <AuthProvider>
+                <AuthLayoutWrapper>
+                  {children}
+                </AuthLayoutWrapper>
+                <Toaster position="top-center" />
+              </AuthProvider>
+            </CurrencyProvider>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

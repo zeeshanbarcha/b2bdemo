@@ -1,76 +1,83 @@
+"use client"
+
 import Link from "next/link"
 import { Facebook, Instagram, Twitter } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
+import { translations } from "@/lib/translations"
 
 export function Footer() {
+  const { language } = useLanguage()
+  const t = translations[language]
+
   return (
     <footer className="border-t border-border bg-background">
       <div className="mx-auto max-w-7xl px-6 py-12">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <div>
-            <h3 className="text-sm font-semibold text-foreground">Shop</h3>
+            <h3 className="text-sm font-semibold text-foreground">{t.footer.shop.title}</h3>
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
               <li>
                 <Link href="/products" className="hover:text-foreground transition-colors">
-                  All Products
+                  {t.footer.shop.allProducts}
                 </Link>
               </li>
               <li>
                 <Link href="/categories" className="hover:text-foreground transition-colors">
-                  Categories
+                  {t.footer.shop.categories}
                 </Link>
               </li>
               <li>
                 <Link href="/deals" className="hover:text-foreground transition-colors">
-                  Deals
+                  {t.footer.shop.deals}
                 </Link>
               </li>
             </ul>
           </div>
           
           <div>
-            <h3 className="text-sm font-semibold text-foreground">Company</h3>
+            <h3 className="text-sm font-semibold text-foreground">{t.footer.company.title}</h3>
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
               <li>
                 <Link href="/about" className="hover:text-foreground transition-colors">
-                  About Us
+                  {t.footer.company.about}
                 </Link>
               </li>
               <li>
                 <Link href="/careers" className="hover:text-foreground transition-colors">
-                  Careers
+                  {t.footer.company.careers}
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="hover:text-foreground transition-colors">
-                  Contact
+                  {t.footer.company.contact}
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-foreground">Help</h3>
+            <h3 className="text-sm font-semibold text-foreground">{t.footer.help.title}</h3>
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
               <li>
                 <Link href="/faq" className="hover:text-foreground transition-colors">
-                  FAQs
+                  {t.footer.help.faq}
                 </Link>
               </li>
               <li>
                 <Link href="/shipping" className="hover:text-foreground transition-colors">
-                  Shipping
+                  {t.footer.help.shipping}
                 </Link>
               </li>
               <li>
                 <Link href="/returns" className="hover:text-foreground transition-colors">
-                  Returns
+                  {t.footer.help.returns}
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-foreground">Connect</h3>
+            <h3 className="text-sm font-semibold text-foreground">{t.footer.connect.title}</h3>
             <div className="mt-4 flex space-x-4">
               <Link 
                 href="#" 
@@ -98,7 +105,7 @@ export function Footer() {
         </div>
         
         <div className="mt-8 border-t border-border pt-8 text-center text-sm text-muted-foreground">
-          <p>© 2024 netflixn. All rights reserved.</p>
+          <p>{t.footer.copyright}</p>
         </div>
       </div>
     </footer>

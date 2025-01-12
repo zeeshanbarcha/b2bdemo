@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { 
@@ -10,6 +12,8 @@ import {
   Dumbbell,
   LucideIcon 
 } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
+import { translations } from "@/lib/translations"
 
 const iconMap: Record<string, LucideIcon> = {
   electronics: Laptop,
@@ -21,30 +25,35 @@ const iconMap: Record<string, LucideIcon> = {
   sports: Dumbbell,
 }
 
-const categories = [
-  { id: "electronics", name: "Electronics" },
-  { id: "home", name: "Home & Kitchen" },
-  { id: "fashion", name: "Fashion" },
-  { id: "computers", name: "Computers" },
-  { id: "automotive", name: "Car & Motorbike" },
-  { id: "beauty", name: "Beauty & Personal Care" },
-  { id: "sports", name: "Sports, Fitness & Outdoors" },
-]
+const categoryIds = [
+  "electronics",
+  "home",
+  "fashion",
+  "computers",
+  "automotive",
+  "beauty",
+  "sports",
+] as const
 
 export function CategoriesSection() {
+  const { language } = useLanguage()
+  const t = translations[language]
+
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
-      {categories.map((category) => {
-        const Icon = iconMap[category.id] || Laptop
+      {categoryIds.map((id) => {
+        const Icon = iconMap[id]
 
         return (
-          <Link key={category.id} href={`/products?category=${category.id}`}>
+          <Link key={id} href={`/products?category=${id}`}>
             <Card className="h-full hover:border-foreground transition-colors">
               <CardContent className="flex flex-col items-center justify-center p-4 text-center">
                 <div className="mb-3 rounded-full bg-muted p-2">
                   <Icon className="h-5 w-5 text-foreground" />
                 </div>
-                <span className="text-sm font-medium text-card-foreground">{category.name}</span>
+                <span className="text-sm font-medium text-card-foreground">
+                  {t.categories[id]}
+                </span>
               </CardContent>
             </Card>
           </Link>

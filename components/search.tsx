@@ -6,6 +6,8 @@ import debounce from "lodash.debounce"
 import { SearchIcon, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import Image from "next/image"
+import { useLanguage } from "@/contexts/language-context"
+import { translations } from "@/lib/translations"
 
 interface Suggestion {
   id: string
@@ -20,6 +22,9 @@ export function Search() {
   const [query, setQuery] = useState(searchParams.get("q") || "")
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
+
+  const { language } = useLanguage()
+  const t = translations[language]
 
   useEffect(() => {
     setQuery(searchParams.get("q") || "")
@@ -77,8 +82,8 @@ export function Search() {
       <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
       <Input
         type="text"
-        placeholder="Search products..."
-        className="w-full pl-9 pr-9"
+        placeholder={t.common.search}
+      className="w-full pl-9 pr-9"
         value={query}
         onChange={handleSearch}
         onFocus={() => setShowSuggestions(true)}

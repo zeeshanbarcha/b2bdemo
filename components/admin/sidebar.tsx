@@ -12,41 +12,22 @@ import {
   Settings,
   Banknote,
 } from "lucide-react"
-
-const routes = [
-  {
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    href: "/admin",
-  },
-  {
-    label: "Products",
-    icon: Package,
-    href: "/admin/products",
-  },
-  {
-    label: "Orders",
-    icon: ShoppingCart,
-    href: "/admin/orders",
-  },
-  {
-    label: "Users",
-    icon: Users,
-    href: "/admin/users",
-  },
-  {
-    label: "Withdrawals",
-    icon: Banknote,
-    href: "/admin/withdrawals",
-  },
-  {
-    label: "Settings",
-    icon: Settings,
-    href: "/admin/settings",
-  },
-]
+import { useLanguage } from "@/contexts/language-context"
+import { translations } from "@/lib/translations"
 
 export function Sidebar() {
+  const { language } = useLanguage()
+  const t = translations[language]
+
+  const routes = [
+    { label: t.admin.panel, icon: LayoutDashboard, href: "/admin" },
+    { label: t.admin.products, icon: Package, href: "/admin/products" },
+    { label: t.admin.orders, icon: ShoppingCart, href: "/admin/orders" },
+    { label: t.admin.users, icon: Users, href: "/admin/users" },
+    { label: t.admin.withdrawals, icon: Banknote, href: "/admin/withdrawals" },
+    { label: t.admin.settings, icon: Settings, href: "/admin/settings" },
+  ]
+
   const pathname = usePathname()
 
   return (

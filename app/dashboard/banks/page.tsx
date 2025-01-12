@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Building2, Plus, Trash2 } from "lucide-react"
 import { toast } from "react-hot-toast"
 import { AddBankModal } from "./add-bank-modal"
+import { useLanguage } from "@/contexts/language-context"
+import { translations } from "@/lib/translations"
 
 interface BankAccount {
   id: string
@@ -20,6 +22,8 @@ export default function BanksPage() {
   const [banks, setBanks] = useState<BankAccount[]>([])
   const [loading, setLoading] = useState(true)
   const [showAddModal, setShowAddModal] = useState(false)
+  const { language } = useLanguage()
+  const t = translations[language];
 
   useEffect(() => {
     fetchBanks()
@@ -32,7 +36,7 @@ export default function BanksPage() {
       const data = await response.json()
       setBanks(data)
     } catch (error) {
-      toast.error("Failed to fetch bank accounts")
+      toast.error(t.dashboard.banks.fetchError)
     } finally {
       setLoading(false)
     }
@@ -45,51 +49,52 @@ export default function BanksPage() {
       })
       if (!response.ok) throw new Error()
       
-      toast.success("Bank account removed")
+      toast.success(t.dashboard.banks.removeSuccess)
       fetchBanks()
     } catch (error) {
-      toast.error("Failed to remove bank account")
+      toast.error(t.dashboard.banks.removeError)
     }
   }
 
-  if (loading) return <div>Loading...</div>
+  if (loading) return <div>{t.common.loading}</div>
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Bank Accounts</h2>
-        <Button onClick={() => setShowAddModal(true)}>
+    <div className="space-y-6 px-4 md:px-0">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="text-2xl font-bold tracking-tight md:text-3xl">{t.dashboard.banks.title}</h2>
+        <Button onClick={() => setShowAddModal(true)} className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
-          Add Bank Account
+          {t.dashboard.banks.addBank}
         </Button>
       </div>
 
       {banks.length === 0 ? (
-        <div className="flex min-h-[400px] flex-col items-center justify-center rounded-md border border-dashed p-8 text-center animate-in fade-in-50">
+        <div className="flex min-h-[300px] flex-col items-center justify-center rounded-md border border-dashed p-4 text-center md:min-h-[400px] md:p-8">
           <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
-            <Building2 className="h-10 w-10 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-semibold">No bank accounts added</h3>
+            <Building2 className="h-8 w-8 text-muted-foreground md:h-10 md:w-10" />
+            <h3 className="mt-4 text-base font-semibold md:text-lg">{t.dashboard.banks.noBanks}</h3>
             <p className="mb-4 mt-2 text-sm text-muted-foreground">
-              You haven't added any bank accounts yet. Add one to manage your payments.
+              {t.dashboard.banks.noBanksDesc}
             </p>
-            <Button onClick={() => setShowAddModal(true)}>
+            <Button onClick={() => setShowAddModal(true)} className="w-full sm:w-auto">
               <Plus className="mr-2 h-4 w-4" />
-              Add Bank Account
+              {t.dashboard.banks.addBank}
             </Button>
           </div>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           {banks.map((bank) => (
             <Card key={bank.id}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-sm font-medium line-clamp-1">
                   {bank.bankName}
                 </CardTitle>
                 <Button 
                   variant="ghost" 
                   size="icon"
                   onClick={() => deleteBank(bank.id)}
+                  className="h-8 w-8"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -97,13 +102,13 @@ export default function BanksPage() {
               <CardContent>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">
-                    Account Name: {bank.accountName}
+                    <span className="font-medium">{t.dashboard.banks.accountName}:</span> {bank.accountName}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Account Number: {bank.accountNumber}
+                    <span className="font-medium">{t.dashboard.banks.accountNumber}:</span> {bank.accountNumber}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Routing Number: {bank.routingNumber}
+                    <span className="font-medium">{t.dashboard.banks.routingNumber}:</span> {bank.routingNumber}
                   </p>
                 </div>
               </CardContent>
