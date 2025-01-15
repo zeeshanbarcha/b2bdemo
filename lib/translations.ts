@@ -730,5 +730,249 @@ export const translations = {
       inCart: "في السلة",
       addToCart: "إضافة إلى السلة"
     },
+  },
+  es: {
+    nav: {
+      products: "Productos",
+      categories: "Categorías",
+      deals: "Ofertas",
+      dashboard: "Panel",
+      profile: "Perfil",
+      settings: "Ajustes",
+      logout: "Cerrar sesión",
+      signIn: "Iniciar sesión",
+      signUp: "Registrarse",
+      account: {
+        profile: "Perfil",
+        settings: "Ajustes"
+      }
+    },
+    common: {
+      search: "Buscar",
+      notifications: "Notificaciones",
+      cart: "Carrito",
+      loading: "Cargando...",
+      error: "Ha ocurrido un error",
+      success: "Éxito",
+      save: "Guardar",
+      cancel: "Cancelar",
+      delete: "Eliminar",
+      edit: "Editar",
+      back: "Volver",
+      messages: {
+        logoutSuccess: "Sesión cerrada exitosamente"
+      }
+    },
+    auth: {
+      createAccount: "Crear cuenta",
+      alreadyHaveAccount: "¿Ya tienes una cuenta?",
+      dontHaveAccount: "¿No tienes una cuenta?",
+      forgotPassword: "¿Olvidaste tu contraseña?",
+      emailPlaceholder: "nombre@ejemplo.com",
+      passwordPlaceholder: "Ingresa tu contraseña",
+      namePlaceholder: "Juan Pérez",
+      pleaseLogin: "Por favor inicia sesión para ver las notificaciones"
+    },
+    dashboard: {
+      welcome: "Bienvenido de nuevo",
+      orders: "Pedidos",
+      wishlist: "Lista de deseos",
+      purchaseHistory: "Historial de compras",
+      downloads: "Descargas",
+      refundRequests: "Solicitudes de reembolso",
+      moneyWithdraw: "Retirar dinero",
+      bankList: "Lista de bancos",
+      settingsLink: "Ajustes",
+      compare: "Comparar",
+      conversations: "Conversaciones",
+      supportTicket: "Ticket de soporte",
+      manageProfile: "Gestionar perfil",
+      dashboard: "Panel",
+      notifications: "Notificaciones",
+      recentOrders: "Pedidos recientes",
+      totalOrders: "Total de pedidos",
+      wishlistItems: "Artículos en lista de deseos",
+      walletBalance: "Saldo de la billetera",
+      withdrawalThreshold: "Límite de retiro",
+      withdrawalEligible: "Elegible para retiro",
+      withdrawalNotEligible: "Aún no elegible para retiro",
+      fromLastMonth: "desde el mes pasado",
+      lastWithdrawal: "Último retiro",
+      rejectionReason: "Motivo de rechazo",
+      withdrawalApproved: "Tu retiro ha sido aprobado y procesado",
+      withdrawFunds: "Retirar fondos",
+      minimumWithdrawal: "El monto mínimo de retiro es",
+      orderHistory: "Ver historial de pedidos",
+      noOrders: "No has realizado ningún pedido aún",
+      orderDate: "Fecha del pedido",
+      quantity: "Cantidad",
+      orderStatus: {
+        pending: "Pendiente",
+        processing: "Procesando",
+        shipped: "Enviado",
+        delivered: "Entregado",
+        cancelled: "Cancelado"
+      },
+      itemsInWishlist: "artículos en tu lista de deseos",
+      removeFromWishlist: "Eliminar de la lista de deseos",
+      viewNotifications: "Ver notificaciones recientes",
+      noNotifications: "No hay notificaciones para mostrar",
+      failedToMarkAsRead: "Error al marcar como leída",
+      banks: {
+        title: "Cuentas bancarias",
+        addBank: "Agregar cuenta bancaria",
+        noBanks: "No hay cuentas bancarias agregadas",
+        noBanksDesc: "No has agregado ninguna cuenta bancaria aún. Agrega una para gestionar tus pagos.",
+        accountName: "Nombre de la cuenta",
+        accountNumber: "Número de cuenta",
+        routingNumber: "Número de ruta",
+        bankName: "Nombre del banco",
+        fetchError: "Error al obtener cuentas bancarias",
+        removeSuccess: "Cuenta bancaria eliminada",
+        removeError: "Error al eliminar cuenta bancaria",
+        addSuccess: "Cuenta bancaria agregada exitosamente",
+        addError: "Error al agregar cuenta bancaria",
+        form: {
+          bankNameLabel: "Nombre del banco",
+          bankNamePlaceholder: "Ingresa el nombre del banco",
+          accountNameLabel: "Nombre de la cuenta",
+          accountNamePlaceholder: "Ingresa el nombre de la cuenta",
+          accountNumberLabel: "Número de cuenta",
+          accountNumberPlaceholder: "Ingresa el número de cuenta",
+          routingNumberLabel: "Número de ruta",
+          routingNumberPlaceholder: "Ingresa el número de ruta"
+        }
+      },
+      settings: {
+        title: "Ajustes",
+        subtitle: "Gestiona los ajustes de tu cuenta",
+        profileInfo: "Información del perfil",
+        addressInfo: "Información de dirección",
+        profilePicture: "Foto de perfil",
+        firstName: "Nombre",
+        lastName: "Apellido",
+        email: "Correo electrónico",
+        phone: "Teléfono",
+        streetAddress: "Dirección",
+        city: "Ciudad",
+        state: "Estado/Provincia",
+        zipCode: "Código postal",
+        country: "País",
+        notifications: {
+          title: "Notificaciones",
+          email: {
+            title: "Notificaciones por correo",
+            description: "Recibe actualizaciones de pedidos y promociones"
+          },
+          sms: {
+            title: "Notificaciones SMS",
+            description: "Recibe actualizaciones de entrega por SMS"
+          },
+          configure: "Configurar"
+        },
+        messages: {
+          updateSuccess: "Ajustes actualizados exitosamente",
+          updateError: "Error al actualizar ajustes",
+          uploadError: {
+            size: "El archivo debe ser menor a 5MB",
+            type: "Por favor sube un archivo de imagen",
+            generic: "Error al subir imagen",
+            noUrl: "No se recibió URL de la subida"
+          },
+          pictureSuccess: "Foto de perfil actualizada exitosamente",
+          pictureError: "Error al actualizar foto de perfil",
+          pleaseLogin: "Por favor inicia sesión para ver los ajustes"
+        }
+      },
+      profile: {
+        title: "Detalles del perfil",
+        pleaseLogin: "Por favor inicia sesión para ver el perfil",
+        noName: "Sin nombre establecido",
+        phone: "Teléfono",
+        phoneNotSet: "No establecido",
+        address: "Dirección",
+        addressNotSet: "No establecida",
+        walletBalance: "Saldo de la billetera",
+        editProfile: "Editar perfil"
+      }
+    },
+    admin: {
+      panel: "Panel de administración",
+      products: "Productos",
+      orders: "Pedidos",
+      users: "Usuarios",
+      withdrawals: "Retiros",
+      settings: "Ajustes",
+      backToWebsite: "Volver al sitio",
+    },
+    home: {
+      hero: {
+        title: "Compra, Ahorra, Gana",
+        subtitle: "Desbloquea recompensas con netflixn en línea",
+        shopNow: "Comprar ahora",
+        viewDeals: "Ver ofertas",
+      },
+      sections: {
+        categories: "Comprar por categoría",
+        featured: "Productos destacados",
+        flashSale: "Venta Flash ⚡",
+        newArrivals: "Recién llegados",
+        viewAll: "Ver todo →",
+      }
+    },
+    footer: {
+      shop: {
+        title: "Tienda",
+        allProducts: "Todos los productos",
+        categories: "Categorías",
+        deals: "Ofertas",
+      },
+      company: {
+        title: "Empresa",
+        about: "Acerca de",
+        careers: "Carreras",
+        contact: "Contacto",
+      },
+      help: {
+        title: "Ayuda",
+        faq: "Preguntas frecuentes",
+        shipping: "Envío",
+        returns: "Devoluciones",
+      },
+      connect: {
+        title: "Síguenos",
+      },
+      copyright: "© 2025 netflixn. Todos los derechos reservados.",
+    },
+    categories: {
+      electronics: "Electrónica",
+      home: "Hogar y Cocina",
+      fashion: "Moda",
+      computers: "Computadoras",
+      automotive: "Automotriz",
+      beauty: "Belleza y Cuidado Personal",
+      sports: "Deportes y Fitness",
+    },
+    products: {
+      title: "Todos los productos",
+      subtitle: "Explora nuestra colección de productos",
+      featured: "Productos destacados",
+      deals: "Ofertas especiales",
+      dealsSubtitle: "No te pierdas estas ofertas excepcionales",
+      filters: {
+        sort: "Ordenar por",
+        newest: "Más reciente",
+        priceAsc: "Precio: menor a mayor",
+        priceDesc: "Precio: mayor a menor",
+      },
+      available: "productos disponibles",
+      noDealsAvailable: "No hay ofertas disponibles en este momento",
+      outOfStock: "Agotado",
+    },
+    cart: {
+      adding: "Agregando...",
+      inCart: "En el carrito",
+      addToCart: "Agregar al carrito",
+    },
   }
 } 

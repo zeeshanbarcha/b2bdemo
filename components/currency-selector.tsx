@@ -14,6 +14,7 @@ const CURRENCIES = [
   { id: "SDG", label: "SDG (SDG)" },
   { id: "AED", label: "AED (AED)" },
   { id: "INR", label: "INR (₹)" },
+  { id: "PYG", label: "PYG (PYG)" },
 ] as const
 
 export function CurrencySelector() {
