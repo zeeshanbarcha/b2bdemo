@@ -13,7 +13,7 @@ import { translations } from "@/lib/translations"
 export function DashboardContent() {
   const [cartCount, setCartCount] = useState(0)
   const [wishlistCount, setWishlistCount] = useState(0)
-  const [withdrawalThreshold, setWithdrawalThreshold] = useState(1500)
+  const [withdrawalThreshold, setWithdrawalThreshold] = useState(17.33)
   const { user } = useAuth()
   const { language } = useLanguage()
   const t = translations[language]

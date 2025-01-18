@@ -58,7 +58,7 @@ export async function GET() {
     })
     
     return NextResponse.json({
-      withdrawalThreshold: settings ? parseFloat(settings.value) : 1500,
+      withdrawalThreshold: settings ? parseFloat(settings.value) : 17.33,
       lastUpdatedBy: settings?.admin
     })
   } catch (error) {
