@@ -10,7 +10,7 @@ import { toast } from "react-hot-toast"
 import { Loader2 } from "lucide-react"
 
 export default function AdminSettingsPage() {
-  const [withdrawalThreshold, setWithdrawalThreshold] = useState(17.33)
+  const [withdrawalThreshold, setWithdrawalThreshold] = useState(1500)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {

@@ -24,7 +24,7 @@ interface LastWithdrawal {
 
 export function WalletBalance({ 
   initialBalance, 
-  withdrawalThreshold = 17.33
+  withdrawalThreshold = 1500
 }: WalletBalanceProps) {
   const { currency, exchangeRates } = useCurrency()
   const { language } = useLanguage()
