@@ -23,18 +23,18 @@ const DEFAULT_EXCHANGE_RATES: Record<Currency, number> = {
 const STORAGE_KEY = 'app-currency'
 
 function getInitialCurrency(): Currency {
-  if (typeof window === 'undefined') return 'INR'
+  if (typeof window === 'undefined') return 'USD'
   try {
     const stored = localStorage.getItem(STORAGE_KEY) as Currency
-    return stored && ['USD', 'SDG', 'INR', 'AED', 'PYG'].includes(stored) ? stored : 'INR'
+    return stored && ['USD', 'SDG', 'INR', 'AED', 'PYG'].includes(stored) ? stored : 'USD'
   } catch {
-    return 'INR'
+    return 'USD'
   }
 }
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false)
-  const [currency, setCurrency] = useState<Currency>('INR')
+  const [currency, setCurrency] = useState<Currency>('USD')
   const [exchangeRates, setExchangeRates] = useState(DEFAULT_EXCHANGE_RATES)
 
   // Handle initial hydration
@@ -54,7 +54,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   // Prevent hydration mismatch
   if (!mounted) {
     return (
-      <CurrencyContext.Provider value={{ currency: 'INR', setCurrency, exchangeRates }}>
+      <CurrencyContext.Provider value={{ currency: 'USD', setCurrency, exchangeRates }}>
         {children}
       </CurrencyContext.Provider>
     )

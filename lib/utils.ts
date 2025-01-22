@@ -25,12 +25,12 @@ const CURRENCY_SYMBOLS: Record<Currency, string> = {
 
 export function formatPrice(
   price: number, 
-  currency: Currency = "INR",
+  currency: Currency = "USD",
   exchangeRates: Record<Currency, number> = DEFAULT_EXCHANGE_RATES
 ) {
   // Convert price from INR to target currency
   const rates = exchangeRates || DEFAULT_EXCHANGE_RATES
-  const convertedPrice = price * (rates[currency] / rates.INR)
+  const convertedPrice = price * (rates[currency] / rates.USD)
 
   return new Intl.NumberFormat('en', {
     style: 'currency',
